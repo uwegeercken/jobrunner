@@ -28,6 +28,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import com.datamelt.coordination.JobManager;
 import com.datamelt.etl.Job;
@@ -63,6 +64,8 @@ public class ClientHandler extends Thread
     
     private static final String DEFAULT_DATETIME_FORMAT		= "yyyy-MM-dd HH:mm:ss";
     private static SimpleDateFormat sdf						= new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
+    
+    private static Map<String,String> environmentVariables;
     
     ClientHandler(String processId, Socket socket, JobManager jobManager, long serverStart) throws Exception
     {
@@ -216,6 +219,7 @@ public class ClientHandler extends Thread
 	            			if(!job.isFinished() && !job.isRunning())
 	            			{
 	            				EtlJob etlJob = new EtlJob(job,jobManager.getFolderLogfiles());
+	            				EtlJob.setEnvironmentVariables(environmentVariables);
 	            				systemMessage(job.getJobId(), "activated to run: " + job.getScheduledStartTime().getTime());
 	            				sendClientMessage(jobId, "activated to run: " + job.getScheduledStartTime().getTime());
 	            				etlJob.start();
@@ -379,4 +383,15 @@ public class ClientHandler extends Thread
 	{
 		return clientStart;
 	}
+
+	public static Map<String, String> getEnvironmentVariables()
+	{
+		return environmentVariables;
+	}
+
+	public static void setEnvironmentVariables(Map<String, String> environmentVariables)
+	{
+		ClientHandler.environmentVariables = environmentVariables;
+	}
+	
 }

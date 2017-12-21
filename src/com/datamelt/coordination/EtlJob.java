@@ -1,8 +1,6 @@
 package com.datamelt.coordination;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,12 +16,6 @@ import com.datamelt.util.Time;
 public class EtlJob extends Thread 
 {
 
-	private static final String ENV_KETTLE_HOME_NAME			= "KETTLE_HOME";
-	private static final String ENV_KETTLE_HOME_VALUE			= "/home/uwe";
-	private static final String ENV_PENTAHO_JAVA_HOME_NAME		= "PENTAHO_JAVA_HOME";
-	private static final String ENV_PENTAHO_JAVA_HOME_VALUE		= "/usr/lib/jvm/java-1.8.0";
-	
-	private static final String ENV_KITCHEN_HOME_VALUE			= "/opt/pentaho/pdi";
 	private static final String ENV_KITCHEN_SCRIPT				= "kitchen.sh";
 	
 	private static final String DEFAULT_DATETIME_FORMAT			= "yyyy-MM-dd HH:mm:ss";
@@ -31,6 +23,7 @@ public class EtlJob extends Thread
 	
 	private static SimpleDateFormat sdf							= new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
 	private static SimpleDateFormat sdfLogs						= new SimpleDateFormat(DEFAULT_LOG_DATETIME_FORMAT);
+	private static Map<String,String> environmentVariables;
 	private Job job;
 	private String logfileFolder								= null;
 	
@@ -57,7 +50,7 @@ public class EtlJob extends Thread
 	{
 		ArrayList <String>parameters = new ArrayList<String>();
 		
-		parameters.add(ENV_KITCHEN_HOME_VALUE + "/" + ENV_KITCHEN_SCRIPT);
+		parameters.add(environmentVariables.get("KITCHEN_HOME") + "/" + ENV_KITCHEN_SCRIPT);
 		parameters.add("-file=" + job.getPath() +"/" + job.getJobName());
 		for(int i=0;i<job.getParameters().size();i++)
 		{
@@ -68,8 +61,7 @@ public class EtlJob extends Thread
 		ProcessBuilder pb = new ProcessBuilder(parameters);
 		
 		Map<String, String> env = pb.environment();
-		env.put(ENV_KETTLE_HOME_NAME, ENV_KETTLE_HOME_VALUE);
-		//env.put(ENV_PENTAHO_JAVA_HOME_NAME, ENV_PENTAHO_JAVA_HOME_VALUE);
+		env.putAll(environmentVariables);
 		
 		pb.directory(new File(job.getPath()));
 		
@@ -131,14 +123,6 @@ public class EtlJob extends Thread
 		    	client.getServerMessage(ClientHandler.RESPONSE_EXIT);
 		    	
 				process = processBuilder.start();
-			/*    BufferedReader output = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			    
-			    String line;
-			    while ((line = output.readLine())!=null)
-			    {
-			    	System.out.println(line);
-			    }
-			  */  
 			    int exitCode = process.waitFor();
 			    job.setExitCode(exitCode);
 			    job.setRunning(false);
@@ -166,5 +150,15 @@ public class EtlJob extends Thread
 		{
 			ex.printStackTrace();
 		}
+	}
+	
+	public static Map<String, String> getEnvironmentVariables()
+	{
+		return environmentVariables;
+	}
+
+	public static void setEnvironmentVariables(Map<String, String> environmentVariables)
+	{
+		EtlJob.environmentVariables = environmentVariables;
 	}
 }

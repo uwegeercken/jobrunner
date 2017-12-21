@@ -25,6 +25,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.net.ServerSocketFactory;
@@ -50,11 +53,12 @@ public class CoordinationServer extends Thread
     private static final String DEFAULT_DATETIME_FORMAT		= "yyyy-MM-dd HH:mm:ss";
     
     private static SimpleDateFormat sdf						= new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
-    
+    private static Map<String,String> environmentVariables	= new HashMap<String,String>();
     
     public CoordinationServer() throws Exception
     {
     	loadProperties();
+    	loadEnvironmentVariables();
     	setVariables();
     	createSocket();
         
@@ -64,6 +68,7 @@ public class CoordinationServer extends Thread
     {
     	propertiesFileFullname = propertiesFile;
     	loadProperties(propertiesFile);
+    	loadEnvironmentVariables();
     	setVariables();
     	createSocket();
     }
@@ -84,6 +89,21 @@ public class CoordinationServer extends Thread
     public String getProperty(String key)
     {
     	return properties.getProperty(key);
+    }
+    
+    private void loadEnvironmentVariables()
+    {
+    	Enumeration<?> enumeration = properties.propertyNames();
+		while (enumeration.hasMoreElements())
+		{
+			String key = (String) enumeration.nextElement();
+			if(key.startsWith("ENV-"))
+			{
+				String realKey = key.substring(4);
+				String value = properties.getProperty(key);
+				environmentVariables.put(realKey, value);
+			}
+		}
     }
     
     private void setVariables()
@@ -150,6 +170,7 @@ public class CoordinationServer extends Thread
                 final Socket socketToClient = serverSocket.accept();
                 System.out.println(sdf.format(new Date()) + " - client connected from: " + socketToClient.getInetAddress());
                 ClientHandler clientHandler = new ClientHandler(getProcessId(socketToClient.getInetAddress().toString()),socketToClient,jobManager,serverStart);
+                ClientHandler.setEnvironmentVariables(environmentVariables);
                 clientHandler.start();
             }
             catch (Exception e)
@@ -175,4 +196,26 @@ public class CoordinationServer extends Thread
 	{
 		return "client-" + clientInetAddress + "_" + sdf.format(new Date());
 	}
+
+	public Properties getProperties()
+	{
+		return properties;
+	}
+
+	public int getPort()
+	{
+		return port;
+	}
+
+	public JobManager getJobManager()
+	{
+		return jobManager;
+	}
+
+	public static Map<String, String> getEnvironmentVariables()
+	{
+		return environmentVariables;
+	}
+	
+	
 }
