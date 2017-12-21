@@ -107,7 +107,7 @@ public class EtlJob extends Thread
 			ex.printStackTrace();
 		}
 		
-		if(jobStatus==0)
+		if(jobStatus==JobManager.STATUS_JOB_CAN_START)
 		{
 			ProcessBuilder processBuilder = getProcessBuilder();
 			

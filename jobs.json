@@ -3,8 +3,8 @@
 			{
 				"id": "id_0001",
 				"name": "job_test_01.kjb",
-				"path": "/home/uwe/development/jobrunner",
-				"scheduled_start_time": "18:45:00",
+				"path": "/home/uwe/development/git/jobrunner/pdi",
+				"scheduled_start_time": "00:38:00",
 				"check_interval": 10000,
 				"max_check_intervals": 5,
 				"requires_dependent_job_finished": false,
@@ -18,7 +18,7 @@
 			{
 				"id": "id_0002",
 				"name": "job_test_02.kjb",
-				"path": "/home/uwe/development/jobrunner",
+				"path": "/home/uwe/development/git/jobrunner/pdi",
 				"scheduled_start_time": "00:03:00",
 				"check_interval": 10000,
 				"max_check_intervals": 5,
