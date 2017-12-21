@@ -148,18 +148,18 @@ public class CoordinationServer extends Thread
     	
     	server.serverStart = System.currentTimeMillis();
     	System.out.println(sdf.format(new Date()) + " - server start...");
-		System.out.println(sdf.format(new Date()) + " - using properties from: " + server.propertiesFileFullname);
+		System.out.println(sdf.format(new Date()) + " - using properties from: [" + server.propertiesFileFullname + "]");
 		File jsonFile = new File(server.getProperty(PROPERTY_JOBS_FILENAME));
 		if(jsonFile.exists())
 		{
 			server.jobManager = new JobManager(server.getProperty(PROPERTY_JOBS_FILENAME));
 			server.jobManager.setFolderLogfiles(server.getProperty(PROPERTY_FOLDER_LOGS));
 			server.start();
-	        System.out.println(sdf.format(new Date()) +  " - waiting on: " + server.serverSocket.getInetAddress() + ", port: " + server.port + " for connections");
+	        System.out.println(sdf.format(new Date()) +  " - waiting on: [" + server.serverSocket.getInetAddress() + "], port: [" + server.port + "] for connections");
 		}
 		else
 		{
-			throw new Exception("error: can not load json file with job definitions: " + server.getProperty(PROPERTY_JOBS_FILENAME));
+			throw new Exception("error: can not load json file with job definitions: [" + server.getProperty(PROPERTY_JOBS_FILENAME) + "]");
 		}
     }
     
@@ -172,7 +172,7 @@ public class CoordinationServer extends Thread
             try  
             {
                 final Socket socketToClient = serverSocket.accept();
-                System.out.println(sdf.format(new Date()) + " - client connected from: " + socketToClient.getInetAddress());
+                //System.out.println(sdf.format(new Date()) + " - client connected from: [" + socketToClient.getInetAddress() +"]");
                 ClientHandler clientHandler = new ClientHandler(getProcessId(socketToClient.getInetAddress().toString()),socketToClient,jobManager,serverStart);
                 ClientHandler.setEnvironmentVariables(environmentVariables);
                 if(getProperty(PROPERTY_SCRIPT_FOLDER)!=null && getProperty(PROPERTY_SCRIPT_NAME)!=null)

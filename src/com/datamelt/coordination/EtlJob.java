@@ -49,8 +49,6 @@ public class EtlJob extends Thread
 	private ProcessBuilder getProcessBuilder()
 	{
 		ArrayList <String>parameters = new ArrayList<String>();
-		
-		//parameters.add(environmentVariables.get("KITCHEN_HOME") + "/" + ENV_KITCHEN_SCRIPT);
 		parameters.add(scriptFolder +"/" + scriptName);
 		parameters.add("-file=" + job.getPath() +"/" + job.getJobName());
 
@@ -113,7 +111,7 @@ public class EtlJob extends Thread
 		{
 			ProcessBuilder processBuilder = getProcessBuilder();
 			
-			File output = new File("/home/uwe/development/jobrunner/" + job.getJobId() + "_" + sdfLogs.format(new Date()) + ".log");
+			File output = new File(logfileFolder + "/" + job.getJobId() + "_" + sdfLogs.format(new Date()) + ".log");
 			processBuilder.redirectOutput(output);
 			Process process = null;
 			try
@@ -121,7 +119,7 @@ public class EtlJob extends Thread
 				job.setActualStartTime(new Time(Calendar.getInstance()));
 				job.setRunning(true);
 				
-				System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId() + "]: started [" + job.getActualStartTime().getTime() + "]");
+				System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId() + "] started [" + job.getActualStartTime().getTime() + "]");
 				
 				// send an exit signal
 		    	client.getServerMessage(ClientHandler.RESPONSE_EXIT);
@@ -133,8 +131,8 @@ public class EtlJob extends Thread
 			    job.setFinished(true);
 			    job.setFinishedTime(new Time(Calendar.getInstance()));
 			    
-				System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId() + "]: finished [" + job.getFinishedTime().getTime() + "]");
-				System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "]: exit code: " + exitCode);
+				System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId() + "] finished [" + job.getFinishedTime().getTime() + "]");
+				System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] exit code: " + exitCode);
 				
 		    	
 			}

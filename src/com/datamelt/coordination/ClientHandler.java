@@ -224,8 +224,8 @@ public class ClientHandler extends Thread
 	            				EtlJob.setEnvironmentVariables(environmentVariables);
 	            				EtlJob.setScriptFolder(scriptFolder);
 	            				EtlJob.setScriptName(scriptName);
-	            				systemMessage(job.getJobId(), "activated to run: " + job.getScheduledStartTime().getTime());
-	            				sendClientMessage(jobId, "activated to run: " + job.getScheduledStartTime().getTime());
+	            				systemMessage(job.getJobId(), "activated to run: [" + job.getScheduledStartTime().getTime() + "]");
+	            				sendClientMessage(jobId, "activated to run: [" + job.getScheduledStartTime().getTime() + "]");
 	            				etlJob.start();
 	            				
 	            			}
@@ -233,11 +233,11 @@ public class ClientHandler extends Thread
 	            			{
 	            				if(job.isFinished())
 	            				{
-	            					sendClientMessage(jobId, "finished: " + job.getFinishedTime().getTime());
+	            					sendClientMessage(jobId, "finished: [" + job.getFinishedTime().getTime() + "]");
 	            				}
 	            				else
 	            				{
-	            					sendClientMessage(jobId, "running: " + job.getActualStartTime().getTime());
+	            					sendClientMessage(jobId, "running: [" + job.getActualStartTime().getTime() + "]");
 	            				}
 	            			}
             			}
@@ -248,7 +248,7 @@ public class ClientHandler extends Thread
             		}
             		else
             		{
-    	                String responseMessage = "unknown message: " + serverObject;
+    	                String responseMessage = "unknown message: [" + serverObject + "]";
     	                sendClientMessage(responseMessage);
             		}
             	}
@@ -316,7 +316,7 @@ public class ClientHandler extends Thread
     
     private void systemMessage(String jobId, String message) throws IOException
     {
-    	System.out.println(sdf.format(new Date()) + " - job [" + jobId + "]: " + message);
+    	System.out.println(sdf.format(new Date()) + " - job [" + jobId + "] " + message);
     }
     
     private void sendClientMessage(Object message) throws IOException
@@ -326,7 +326,7 @@ public class ClientHandler extends Thread
     
     private void sendClientMessage(String jobId, Object message) throws IOException
     {
-    	sendMessage("[" + jobId + "]: " + message);
+    	sendMessage("[" + jobId + "] " + message);
     }
 
     private void sendMessage(Object responseMessage) throws IOException
