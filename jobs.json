@@ -8,9 +8,7 @@
 				"check_interval": 10000,
 				"max_check_intervals": 5,
 				"requires_dependent_job_finished": false,
-				"parameters": [
-					{"parameter": "jobnumber=1"}
-				],
+				"parameters": {"jobnumber": "1","test": "xx"},
 				"log_level": "Minimal",
 				"run_reports": true,
 				"reports": [
@@ -26,9 +24,7 @@
 				"max_check_intervals": 5,
 				"depends_on_job": "id_0001",
 				"requires_dependent_job_finished": true,
-				"parameters": [
-					{"parameter": "jobnumber=2"}
-				],
+				"parameters": {"jobnumber": "2"},
 				"log_level": "Basic",
 				"run_reports": false,
 				"reports": [

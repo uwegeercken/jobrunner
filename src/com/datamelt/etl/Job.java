@@ -1,7 +1,7 @@
 package com.datamelt.etl;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import org.json.simple.JSONObject;
 
 import com.datamelt.util.Time;
 
@@ -27,7 +27,7 @@ public class Job implements Comparable<Job>
 	private long maxCheckIntervals 					= DEFAULT_MAX_CHECK_INTERVALS;
 	private String logLevel							= "Basic";
 	private int exitCode							= 0;
-	private ArrayList<String> parameters 			= new ArrayList<String>();
+	private JSONObject parameters;
 	
 	public Job(String id, String name, String path)
 	{
@@ -211,9 +211,14 @@ public class Job implements Comparable<Job>
 		this.finishedTime = finishedTime;
 	}
 
-	public ArrayList<String> getParameters()
+	public JSONObject getParameters()
 	{
 		return parameters;
+	}
+
+	public void setParameters(JSONObject parameters)
+	{
+		this.parameters = parameters;
 	}
 
 	public String getLogLevel()

@@ -66,6 +66,8 @@ public class ClientHandler extends Thread
     private static SimpleDateFormat sdf						= new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
     
     private static Map<String,String> environmentVariables;
+    private static String scriptName;
+    private static String scriptFolder;
     
     ClientHandler(String processId, Socket socket, JobManager jobManager, long serverStart) throws Exception
     {
@@ -220,6 +222,8 @@ public class ClientHandler extends Thread
 	            			{
 	            				EtlJob etlJob = new EtlJob(job,jobManager.getFolderLogfiles());
 	            				EtlJob.setEnvironmentVariables(environmentVariables);
+	            				EtlJob.setScriptFolder(scriptFolder);
+	            				EtlJob.setScriptName(scriptName);
 	            				systemMessage(job.getJobId(), "activated to run: " + job.getScheduledStartTime().getTime());
 	            				sendClientMessage(jobId, "activated to run: " + job.getScheduledStartTime().getTime());
 	            				etlJob.start();
@@ -392,6 +396,26 @@ public class ClientHandler extends Thread
 	public static void setEnvironmentVariables(Map<String, String> environmentVariables)
 	{
 		ClientHandler.environmentVariables = environmentVariables;
+	}
+
+	public static String getScriptName()
+	{
+		return scriptName;
+	}
+
+	public static void setScriptName(String scriptName)
+	{
+		ClientHandler.scriptName = scriptName;
+	}
+
+	public static String getScriptFolder()
+	{
+		return scriptFolder;
+	}
+
+	public static void setScriptFolder(String scriptFolder)
+	{
+		ClientHandler.scriptFolder = scriptFolder;
 	}
 	
 }

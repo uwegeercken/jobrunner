@@ -15,15 +15,15 @@ import com.datamelt.util.Time;
 
 public class EtlJob extends Thread 
 {
-
-	private static final String ENV_KITCHEN_SCRIPT				= "kitchen.sh";
-	
 	private static final String DEFAULT_DATETIME_FORMAT			= "yyyy-MM-dd HH:mm:ss";
 	private static final String DEFAULT_LOG_DATETIME_FORMAT		= "yyyyMMddHHmmss";
 	
 	private static SimpleDateFormat sdf							= new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
 	private static SimpleDateFormat sdfLogs						= new SimpleDateFormat(DEFAULT_LOG_DATETIME_FORMAT);
 	private static Map<String,String> environmentVariables;
+	private static String scriptName;
+    private static String scriptFolder;
+    
 	private Job job;
 	private String logfileFolder								= null;
 	
@@ -50,12 +50,16 @@ public class EtlJob extends Thread
 	{
 		ArrayList <String>parameters = new ArrayList<String>();
 		
-		parameters.add(environmentVariables.get("KITCHEN_HOME") + "/" + ENV_KITCHEN_SCRIPT);
+		//parameters.add(environmentVariables.get("KITCHEN_HOME") + "/" + ENV_KITCHEN_SCRIPT);
+		parameters.add(scriptFolder +"/" + scriptName);
 		parameters.add("-file=" + job.getPath() +"/" + job.getJobName());
-		for(int i=0;i<job.getParameters().size();i++)
-		{
-			parameters.add("-param:" + job.getParameters().get(i));
-		}
+
+    	for(Object key: job.getParameters().keySet())
+    	{
+    		String value= (String) job.getParameters().get(key);
+    		parameters.add("-param:" + key + "=" + value);
+    	}
+        	
 		parameters.add("-level=" + job.getLogLevel());
 		
 		ProcessBuilder pb = new ProcessBuilder(parameters);
@@ -160,5 +164,25 @@ public class EtlJob extends Thread
 	public static void setEnvironmentVariables(Map<String, String> environmentVariables)
 	{
 		EtlJob.environmentVariables = environmentVariables;
+	}
+	
+	public static String getScriptName()
+	{
+		return scriptName;
+	}
+
+	public static void setScriptName(String scriptName)
+	{
+		EtlJob.scriptName = scriptName;
+	}
+
+	public static String getScriptFolder()
+	{
+		return scriptFolder;
+	}
+
+	public static void setScriptFolder(String scriptFolder)
+	{
+		EtlJob.scriptFolder = scriptFolder;
 	}
 }

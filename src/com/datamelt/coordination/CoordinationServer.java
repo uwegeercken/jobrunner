@@ -49,6 +49,10 @@ public class CoordinationServer extends Thread
     private static final String PROPERTY_FOLDER_LOGS		= "folder.logs";
     private static final String PROPERTY_JOBS_FILENAME		= "jobs.filename";
     private static final String PROPERTY_PORT 				= "server.port";
+    private static final String PROPERTY_SCRIPT_FOLDER		= "script.folder";
+    private static final String PROPERTY_SCRIPT_NAME		= "script.name";
+    
+    
     private static final int 	DEFAULT_PORT 				= 9000;
     private static final String DEFAULT_DATETIME_FORMAT		= "yyyy-MM-dd HH:mm:ss";
     
@@ -171,9 +175,18 @@ public class CoordinationServer extends Thread
                 System.out.println(sdf.format(new Date()) + " - client connected from: " + socketToClient.getInetAddress());
                 ClientHandler clientHandler = new ClientHandler(getProcessId(socketToClient.getInetAddress().toString()),socketToClient,jobManager,serverStart);
                 ClientHandler.setEnvironmentVariables(environmentVariables);
-                clientHandler.start();
+                if(getProperty(PROPERTY_SCRIPT_FOLDER)!=null && getProperty(PROPERTY_SCRIPT_NAME)!=null)
+                {
+	                ClientHandler.setScriptName(getProperty(PROPERTY_SCRIPT_NAME));
+	                ClientHandler.setScriptFolder(getProperty(PROPERTY_SCRIPT_FOLDER));
+	                clientHandler.start();
+                }
+                else
+                {
+                	throw new Exception("the variables [script.folder] and [script.name] must be defined in the properties file");
+                }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
             	ok = false;
             	if(!serverSocket.isClosed())
@@ -182,12 +195,12 @@ public class CoordinationServer extends Thread
             		{
 						serverSocket.close();
 					} 
-            		catch (IOException e1)
+            		catch (IOException ioexception)
             		{
-						e1.printStackTrace();
+            			ioexception.printStackTrace();
 					}
             	}
-                e.printStackTrace();
+                ex.printStackTrace();
             }
         }
     }

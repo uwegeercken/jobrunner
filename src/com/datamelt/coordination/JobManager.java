@@ -186,13 +186,16 @@ public class JobManager
             	}
             	if(jsonJob.get(JSON_KEY_JOB_PARAMETERS)!=null)
             	{
-	            	JSONArray parameters = (JSONArray) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
+	            	
+            		//JSONArray parameters = (JSONArray) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
+            		JSONObject parameters = (JSONObject) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
+	            	job.setParameters(parameters);
 	            	for(int i=0;i<parameters.size();i++)
 	            	{
-	            		JSONObject jobParameter = (JSONObject) parameters.get(i);
+	            		//JSONObject jobParameter = (JSONObject) parameters.get(i);
 	            		
-	            		String parameter = jobParameter.get(JSON_KEY_JOB_PARAMETER).toString();
-	            		job.getParameters().add(parameter);
+	            		//String parameter = jobParameter.get(JSON_KEY_JOB_PARAMETER).toString();
+	            		//job.getParameters().add(parameters);
 	            	}
             	}           	
         		addJob(job);
