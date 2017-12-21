@@ -101,7 +101,7 @@ public class CoordinationServer extends Thread
 		while (enumeration.hasMoreElements())
 		{
 			String key = (String) enumeration.nextElement();
-			if(key.startsWith("ENV-"))
+			if(key.startsWith("env."))
 			{
 				String realKey = key.substring(4);
 				String value = properties.getProperty(key);

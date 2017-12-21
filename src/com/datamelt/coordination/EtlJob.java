@@ -81,23 +81,23 @@ public class EtlJob extends Thread
 		{
 			client = new CoordinationClient("127.0.0.1",9000);
 			
-			while(jobStatus!=0)
+			while(jobStatus!=JobManager.STATUS_JOB_CAN_START)
 			{
-				jobStatus = (int)client.getServerMessage(ClientHandler.RESPONSE_JOB_CAN_START + ClientHandler.DELIMITER + job.getJobId());
-				if(jobStatus==1)
+				jobStatus = (int)client.getServerMessage(ClientHandler.RESPONSE_JOB_START_STATUS + ClientHandler.DELIMITER + job.getJobId());
+				if(jobStatus==JobManager.STATUS_SCHEDULED_TIME_NOT_REACHED)
 				{
 					//System.out.println(sdf.format(new Date()) + " - [" + job.getJobId()+ "]: job scheduled start time not reached: " + job.getScheduledStartTime().getTime());
 					sleep(job.getCheckInterval());
 				}
-				else if(jobStatus==2 && job.getCheckIntervalCounter() < job.getMaxCheckIntervals())
+				else if(jobStatus==JobManager.STATUS_DEPENDENT_JOB_NOT_FINISHED && job.getCheckIntervalCounter() < job.getMaxCheckIntervals())
 				{
 					job.setCheckIntervalCounter(job.getCheckIntervalCounter()+1);
-					System.out.println(sdf.format(new Date()) + " - [" + job.getJobId()+ "]: job is waiting for dependent job to finish. retries left: " + (job.getMaxCheckIntervals() - job.getCheckIntervalCounter()));
+					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] - waiting for dependent job to finish. retries left: " + (job.getMaxCheckIntervals() - job.getCheckIntervalCounter()));
 					sleep(job.getCheckInterval());
 				}
-				else if(jobStatus!=0)
+				else if(jobStatus!=JobManager.STATUS_JOB_CAN_START)
 				{
-					System.out.println(sdf.format(new Date()) + " - [" + job.getJobId()+ "]: dependent job not finished and max check intervals is reached");
+					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] - dependent job not finished and max check intervals is reached");
 					break;
 				}
 			}

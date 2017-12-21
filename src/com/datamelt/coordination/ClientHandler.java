@@ -45,7 +45,7 @@ public class ClientHandler extends Thread
     
     // list of possible messages
     // the "exit" message is explicitly excluded here
-    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "resetjobs", "reloadjobs"};
+    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "resetjobs", "reloadjobs"};
     
     public static final String RESPONSE_UPTIME 				= "uptime";
     public static final String RESPONSE_EXIT 				= "exit";
@@ -53,6 +53,7 @@ public class ClientHandler extends Thread
     public static final String RESPONSE_HELLO				= "hello";
     public static final String RESPONSE_JOB_FINISHED		= "jobfinished";
     public static final String RESPONSE_JOB_CAN_START		= "jobcanstart";
+    public static final String RESPONSE_JOB_START_STATUS	= "jobstartstatus";
     public static final String RESPONSE_JOB_STARTTIME		= "jobstarttime";
     public static final String RESPONSE_JOB_RUNTIME			= "jobruntime";
     public static final String RESPONSE_RESET_JOBS			= "resetjobs";
@@ -126,11 +127,24 @@ public class ClientHandler extends Thread
             			int jobStatus = jobManager.getJobStatus(jobId);
             			if(jobStatus != JobManager.STATUS_UNDEFINED)
             			{
+            				sendClientMessage(JobManager.JOB_STATUS[jobStatus]);
+            			}
+            			else
+            			{
+            				sendClientMessage(jobId, "not existing");
+            			}
+            		}
+            		else if(serverObject.startsWith(RESPONSE_JOB_START_STATUS))
+            		{
+            			String jobId = parseJobId(serverObject);
+            			int jobStatus = jobManager.getJobStatus(jobId);
+            			if(jobStatus != JobManager.STATUS_UNDEFINED)
+            			{
             				sendClientMessage(jobStatus);
             			}
             			else
             			{
-            				sendClientMessage(jobId,"is not existing");
+            				sendClientMessage(jobId, "not existing");
             			}
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_STARTTIME))
@@ -143,15 +157,15 @@ public class ClientHandler extends Thread
             			}
             			else
             			{
-            				sendClientMessage(jobId, "is not existing");
+            				sendClientMessage(jobId, "not existing");
             			}
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_RUNTIME))
             		{
             			String jobId = parseJobId(serverObject);
-            			if(jobId!=null)
-            			{
-            				Job job = jobManager.getJob(jobId);
+        				Job job = jobManager.getJob(jobId);
+        				if(job!=null)
+        				{
             				if(job.getActualStartTime()!=null && job.getFinishedTime()!=null)
             				{
             					long jobStarttime = job.getActualStartTime().getTimeInMillis();
@@ -160,16 +174,16 @@ public class ClientHandler extends Thread
             				}
             				else if(job.getActualStartTime()==null)
             				{
-            					sendClientMessage("job has not started");
+            					sendClientMessage(jobId, "not started");
             				}
             				else
             				{
-            					sendClientMessage("job has not finished");
+            					sendClientMessage(jobId, "not finished");
             				}
             			}
             			else
             			{
-            				sendClientMessage(jobId, "is not existing");
+            				sendClientMessage(jobId, "not existing");
             			}
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_EXIT_CODE))
@@ -182,14 +196,14 @@ public class ClientHandler extends Thread
             		{
             			jobManager.resetJobs();
             			
-            			systemMessage("reset all jobs and schedule for current date");
+            			systemMessage("reset jobs. set schedules to current date");
     	                sendClientMessage("ok");
             		}
             		else if(serverObject.startsWith(RESPONSE_RELOAD_JOBS))
             		{
             			jobManager.reloadJobs();
             			
-            			systemMessage("reloaded all jobs");
+            			systemMessage("reloaded jobs");
     	                sendClientMessage("ok");
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_FINISHED))
@@ -204,12 +218,12 @@ public class ClientHandler extends Thread
             				}
             				else
             				{
-            					sendClientMessage(jobId,"finished: " + job.isFinished());
+            					sendClientMessage(jobId, "finished: " + job.isFinished());
             				}
             			}
             			else
             			{
-            				sendClientMessage(jobId, "is not existing");
+            				sendClientMessage(jobId, "not existing");
             			}
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_RUN))
@@ -224,8 +238,8 @@ public class ClientHandler extends Thread
 	            				EtlJob.setEnvironmentVariables(environmentVariables);
 	            				EtlJob.setScriptFolder(scriptFolder);
 	            				EtlJob.setScriptName(scriptName);
-	            				systemMessage(job.getJobId(), "activated to run: [" + job.getScheduledStartTime().getTime() + "]");
-	            				sendClientMessage(jobId, "activated to run: [" + job.getScheduledStartTime().getTime() + "]");
+	            				systemMessage(job.getJobId(), "activated run. scheduled: [" + job.getScheduledStartTime().getTime() + "]");
+	            				sendClientMessage(jobId, "activated run. scheduled: [" + job.getScheduledStartTime().getTime() + "]");
 	            				etlJob.start();
 	            				
 	            			}
@@ -243,7 +257,7 @@ public class ClientHandler extends Thread
             			}
             			else
             			{
-            				sendClientMessage(jobId, "is not existing");
+            				sendClientMessage(jobId, "not existing");
             			}
             		}
             		else
@@ -326,7 +340,7 @@ public class ClientHandler extends Thread
     
     private void sendClientMessage(String jobId, Object message) throws IOException
     {
-    	sendMessage("[" + jobId + "] " + message);
+    	sendMessage("job [" + jobId + "] " + message);
     }
 
     private void sendMessage(Object responseMessage) throws IOException

@@ -32,10 +32,12 @@ public class JobManager
 	public static final String JSON_KEY_JOB_PARAMETER						= "parameter";
 		
 	
-	public static final int STATUS_UNDEFINED	 				= -1;
-	public static final int STATUS_JOB_CAN_START 				= 0;
-	public static final int STATUS_SCHEDULED_TIME_NOT_REACHED 	= 1;
-	public static final int STATUS_DEPENDENT_JOB_NOT_FINISHED 	= 2;
+	public static final int STATUS_UNDEFINED	 				= 0;
+	public static final int STATUS_JOB_CAN_START 				= 1;
+	public static final int STATUS_SCHEDULED_TIME_NOT_REACHED 	= 2;
+	public static final int STATUS_DEPENDENT_JOB_NOT_FINISHED 	= 3;
+	
+	public static final String[] JOB_STATUS 					= {"undefined","can start","scheduled time not reached","dependent job not finished"};
 	
 	public static final String TIME_DELIMITER					= ":";
 	
@@ -276,7 +278,7 @@ public class JobManager
 	
 	public int getJobStatus(Job job)
 	{
-		int status=-1;
+		int status = STATUS_UNDEFINED;
 		if(!getJobScheduledTimeReached(job))
 		{
 			status = STATUS_SCHEDULED_TIME_NOT_REACHED;

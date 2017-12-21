@@ -19,7 +19,7 @@
 				"id": "id_0002",
 				"name": "job_test_02.kjb",
 				"path": "/home/uwe/development/jobrunner",
-				"scheduled_start_time": "18:45:00",
+				"scheduled_start_time": "00:03:00",
 				"check_interval": 10000,
 				"max_check_intervals": 5,
 				"depends_on_job": "id_0001",
