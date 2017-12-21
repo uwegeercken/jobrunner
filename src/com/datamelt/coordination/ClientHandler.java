@@ -29,7 +29,7 @@ import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.datamelt.etl.JobManager;
+import com.datamelt.coordination.JobManager;
 import com.datamelt.etl.Job;
 
 public class ClientHandler extends Thread

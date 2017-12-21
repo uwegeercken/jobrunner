@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import javax.net.ServerSocketFactory;
 
-import com.datamelt.etl.JobManager;
+import com.datamelt.coordination.JobManager;
 import com.datamelt.util.FileUtility;
 
 public class CoordinationServer extends Thread

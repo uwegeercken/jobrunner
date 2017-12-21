@@ -1,4 +1,4 @@
-package com.datamelt.etl;
+package com.datamelt.coordination;
 
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -9,6 +9,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import com.datamelt.etl.Job;
+import com.datamelt.etl.JobCollection;
+import com.datamelt.etl.Report;
+import com.datamelt.etl.ReportCollection;
 import com.datamelt.util.Time;
 
 public class JobManager
