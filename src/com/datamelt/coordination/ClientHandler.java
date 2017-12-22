@@ -211,9 +211,16 @@ public class ClientHandler extends Thread
             		else if(serverObject.startsWith(RESPONSE_NEXT_JOB))
             		{
             				ArrayList<String> nextJobIds = jobManager.getNextJobs();
-            				String jobId = nextJobIds.get(0);
-            				Job job = jobManager.getJob(jobId);
-        					sendClientMessage("next job(s): " + nextJobIds + " at [" +job.getScheduledStartTime().getTime() + "]");
+            				if(nextJobIds.size()>0)
+            				{
+            					String jobId = nextJobIds.get(0);
+            					Job job = jobManager.getJob(jobId);
+            					sendClientMessage("next job(s): " + nextJobIds + " at [" +job.getScheduledStartTime().getTime() + "]");
+            				}
+            				else
+            				{
+            					sendClientMessage("no next job");
+            				}
             		}
             		else if(serverObject.startsWith(RESPONSE_LIST_JOBS))
             		{
