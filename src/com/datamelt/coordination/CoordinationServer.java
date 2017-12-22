@@ -145,7 +145,7 @@ public class CoordinationServer extends Thread
     	{
     		if(args[0].equals("-h")||args[0].equals("-help"))
     		{
-    			//help();
+    			help();
     		}
     		else
     		{
@@ -212,11 +212,24 @@ public class CoordinationServer extends Thread
         }
     }
 
-	private String getProcessId(String clientInetAddress)
-	{
-		return "client-" + clientInetAddress + "_" + sdf.format(new Date());
-	}
-
+    public static void help()
+    {
+    	System.out.println("CoordinationServer. Server process to run ETL jobs, which are defined in a json file.");
+    	System.out.println();
+    	System.out.println("Start this class without arguments to use the defaults or pass the path and name of");
+    	System.out.println("the properties file where variables are defined.");
+    	System.out.println();
+    	System.out.println("The server listens per default on port 9000. Use the CoordinationClientMessage class");
+    	System.out.println("to pass messages to the server. Messages to the server can request status information");
+    	System.out.println("or may trigger task, such as to run a job.");
+    	System.out.println();
+    	System.out.println("For further functionality consult the API documentation and the handbook.");
+    	System.out.println();
+    	System.out.println("published as open source under the Apache License. read the licence notice");
+    	System.out.println("all code by uwe geercken, 2017. uwe.geercken@web.de");
+    	System.out.println();
+    }
+    
 	public Properties getProperties()
 	{
 		return properties;
