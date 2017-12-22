@@ -44,12 +44,15 @@ public class EtlJob extends Thread
     private static String scriptFolder;
     
 	private Job job;
+	private String hostname 									= "127.0.0.1";
+	private int serverPort;
 	private String logfileFolder								= null;
 	
 	
-	public EtlJob(Job job, String logfileFolder) throws Exception
+	public EtlJob(Job job, int serverPort, String logfileFolder) throws Exception
 	{
 		this.job = job;
+		this.serverPort = serverPort;
 		if(logfileFolder!=null && logfileFolder.trim().equals(""))
 		{
 			this.logfileFolder = logfileFolder;
@@ -98,7 +101,7 @@ public class EtlJob extends Thread
 		
 		try
 		{
-			client = new CoordinationClient("127.0.0.1",9000);
+			client = new CoordinationClient(hostname,serverPort);
 			
 			while(jobStatus!=JobManager.STATUS_JOB_CAN_START)
 			{

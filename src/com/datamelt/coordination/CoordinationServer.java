@@ -173,7 +173,7 @@ public class CoordinationServer extends Thread
             {
                 final Socket socketToClient = serverSocket.accept();
                 //System.out.println(sdf.format(new Date()) + " - client connected from: [" + socketToClient.getInetAddress() +"]");
-                ClientHandler clientHandler = new ClientHandler(getProcessId(socketToClient.getInetAddress().toString()),socketToClient,jobManager,serverStart);
+                ClientHandler clientHandler = new ClientHandler(getProcessId(socketToClient.getInetAddress().toString()),socketToClient, jobManager, port, serverStart);
                 ClientHandler.setEnvironmentVariables(environmentVariables);
                 if(getProperty(PROPERTY_SCRIPT_FOLDER)!=null && getProperty(PROPERTY_SCRIPT_NAME)!=null)
                 {

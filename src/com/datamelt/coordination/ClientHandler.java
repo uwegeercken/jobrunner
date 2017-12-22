@@ -40,6 +40,7 @@ public class ClientHandler extends Thread
 	private Socket socket;
     private long clientStart;
     private long serverStart;
+    private int serverPort;
     private JobManager jobManager;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
@@ -74,10 +75,11 @@ public class ClientHandler extends Thread
     private static String scriptName;
     private static String scriptFolder;
     
-    ClientHandler(String processId, Socket socket, JobManager jobManager, long serverStart) throws Exception
+    ClientHandler(String processId, Socket socket, JobManager jobManager, int serverPort, long serverStart) throws Exception
     {
     	this.clientStart = System.currentTimeMillis();
     	this.serverStart = serverStart;
+    	this.serverPort = serverPort;
     	this.jobManager = jobManager;
     	this.processId= processId;
         this.socket = socket;
@@ -269,7 +271,7 @@ public class ClientHandler extends Thread
             			{
 	            			if(!job.isFinished() && !job.isRunning())
 	            			{
-	            				EtlJob etlJob = new EtlJob(job,jobManager.getFolderLogfiles());
+	            				EtlJob etlJob = new EtlJob(job, serverPort, jobManager.getFolderLogfiles());
 	            				EtlJob.setEnvironmentVariables(environmentVariables);
 	            				EtlJob.setScriptFolder(scriptFolder);
 	            				EtlJob.setScriptName(scriptName);

@@ -19,9 +19,12 @@
 
 package com.datamelt.coordination;
 
+import java.io.File;
 import java.io.FileReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 
 import org.json.simple.JSONArray;
@@ -32,39 +35,42 @@ import com.datamelt.etl.Job;
 import com.datamelt.etl.JobCollection;
 import com.datamelt.etl.Report;
 import com.datamelt.etl.ReportCollection;
+import com.datamelt.util.FileUtility;
 import com.datamelt.util.Time;
 
 public class JobManager
 {
-	public static final String JSON_KEY_JOB_ID								= "id";
-	public static final String JSON_KEY_JOB_NAME							= "name";
-	public static final String JSON_KEY_JOB_PATH							= "path";
-	public static final String JSON_KEY_JOBS								= "jobs";
-	public static final String JSON_KEY_JOB_RUN_REPORTS						= "run_reports";
-	public static final String JSON_KEY_JOB_SCHEDULED_START_TIME			= "scheduled_start_time";
-	public static final String JSON_KEY_JOB_CHECK_INTERVAL					= "check_interval";
-	public static final String JSON_KEY_JOB_LOG_LEVEL						= "log_level";
-	public static final String JSON_KEY_JOB_MAX_CHECK_INTERVALS				= "max_check_intervals";
-	public static final String JSON_KEY_JOB_DEPENDS_ON_JOB					= "depends_on_job";
-	public static final String JSON_KEY_JOB__DEPENDENT_JOB_ID				= "jobid";
-	public static final String JSON_KEY_JOB_PARAMETERS						= "parameters";
-	public static final String JSON_KEY_JOB_PARAMETER						= "parameter";
-		
+	public static final String JSON_KEY_JOB_ID						= "id";
+	public static final String JSON_KEY_JOB_NAME					= "name";
+	public static final String JSON_KEY_JOB_PATH					= "path";
+	public static final String JSON_KEY_JOBS						= "jobs";
+	public static final String JSON_KEY_JOB_RUN_REPORTS				= "run_reports";
+	public static final String JSON_KEY_JOB_SCHEDULED_START_TIME	= "scheduled_start_time";
+	public static final String JSON_KEY_JOB_CHECK_INTERVAL			= "check_interval";
+	public static final String JSON_KEY_JOB_LOG_LEVEL				= "log_level";
+	public static final String JSON_KEY_JOB_MAX_CHECK_INTERVALS		= "max_check_intervals";
+	public static final String JSON_KEY_JOB_DEPENDS_ON_JOB			= "depends_on_job";
+	public static final String JSON_KEY_JOB_DEPENDENT_JOB_ID		= "jobid";
+	public static final String JSON_KEY_JOB_PARAMETERS				= "parameters";
+	public static final String JSON_KEY_JOB_PARAMETER				= "parameter";
 	
-	public static final int STATUS_UNDEFINED	 				= 0;
-	public static final int STATUS_JOB_CAN_START 				= 1;
-	public static final int STATUS_SCHEDULED_TIME_NOT_REACHED 	= 2;
-	public static final int STATUS_DEPENDENT_JOB_NOT_FINISHED 	= 3;
-	public static final int STATUS_DEPENDENT_JOB_BAD_EXIT_CODE 	= 4;
+	private static final String DEFAULT_DATETIME_FORMAT				= "yyyy-MM-dd HH:mm:ss";
+    private static SimpleDateFormat sdf								= new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
 	
-	public static final String[] JOB_STATUS 					= {"undefined","can start","scheduled time not reached","dependent job(s) not finished", "dependent job(s) with bad exit code"};
+	public static final int STATUS_UNDEFINED	 					= 0;
+	public static final int STATUS_JOB_CAN_START 					= 1;
+	public static final int STATUS_SCHEDULED_TIME_NOT_REACHED 		= 2;
+	public static final int STATUS_DEPENDENT_JOB_NOT_FINISHED 		= 3;
+	public static final int STATUS_DEPENDENT_JOB_BAD_EXIT_CODE 		= 4;
 	
-	public static final String TIME_DELIMITER					= ":";
+	public static final String[] JOB_STATUS 						= {"undefined","can start","scheduled time not reached","dependent job(s) not finished", "dependent job(s) with bad exit code"};
 	
-	private JobCollection jobs 									= new JobCollection();
-	private ReportCollection reports 							= new ReportCollection();
-	private String jobFilename									= null;
-	private String folderLogfiles								= null;
+	public static final String TIME_DELIMITER						= ":";
+	
+	private JobCollection jobs 										= new JobCollection();
+	private ReportCollection reports 								= new ReportCollection();
+	private String jobFilename										= null;
+	private String folderLogfiles									= null;
 	
 	public JobManager(String filename) throws Exception
 	{
@@ -111,6 +117,28 @@ public class JobManager
 		return list;
 	}
 
+	private boolean checkFileOk(String path, String jobName)
+	{
+		if(path!=null && jobName!=null)
+		{
+			String fullFilename = FileUtility.adjustSlash(path) + jobName;
+			File file = new File(fullFilename);
+			if(file.exists() && file.isFile() && file.canRead())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
+	
 	public void removeJob(String jobId)
 	{
 		int counter=0;
@@ -176,54 +204,70 @@ public class JobManager
             	String jobName = (String) jsonJob.get(JSON_KEY_JOB_NAME);
             	String jobPath = (String) jsonJob.get(JSON_KEY_JOB_PATH);
 
-            	Job job = new Job(jobId,jobName,jobPath);
+            	boolean fileOk = checkFileOk(jobPath, jobName);
             	
-            	if(jsonJob.get(JSON_KEY_JOB_RUN_REPORTS)!=null)
+            	if(jobId!= null && fileOk)
             	{
-            		job.setRunReports((boolean) jsonJob.get(JSON_KEY_JOB_RUN_REPORTS));	
+	            	Job job = new Job(jobId,jobName,jobPath);
+	            	
+	            	if(jsonJob.get(JSON_KEY_JOB_RUN_REPORTS)!=null)
+	            	{
+	            		job.setRunReports((boolean) jsonJob.get(JSON_KEY_JOB_RUN_REPORTS));	
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_SCHEDULED_START_TIME)!=null)
+	            	{
+	            		String parts[] = ((String) jsonJob.get(JSON_KEY_JOB_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
+	            		if(parts.length==3)
+	            		{
+	            			int hours = Integer.parseInt(parts[0]);
+	            			int minutes = Integer.parseInt(parts[1]);
+	            			int seconds = Integer.parseInt(parts[2]);
+	            			job.setScheduledStartTime(new Time(hours,minutes,seconds));
+	            		}
+	            		else
+	            		{
+	            			throw new Exception("invalid scheduled start time definition. correct format is: [HH:mm:ss]");
+	            		}
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_CHECK_INTERVAL)!=null)
+	            	{
+	            		job.setCheckInterval((long) jsonJob.get(JSON_KEY_JOB_CHECK_INTERVAL));	
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_LOG_LEVEL)!=null)
+	            	{
+	            		job.setLogLevel((String) jsonJob.get(JSON_KEY_JOB_LOG_LEVEL));	
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_MAX_CHECK_INTERVALS)!=null)
+	            	{
+	            		job.setMaxCheckIntervals((long) jsonJob.get(JSON_KEY_JOB_MAX_CHECK_INTERVALS));	
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB)!=null)
+	            	{
+	            		JSONArray dependentJobs = (JSONArray) jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB);
+	            		for(int i=0;i< dependentJobs.size();i++)
+	                	{
+	            			JSONObject dependentJob = (JSONObject) dependentJobs.get(i);
+	            			job.addDependentJob((String) dependentJob.get(JSON_KEY_JOB_DEPENDENT_JOB_ID));
+	            		}
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_PARAMETERS)!=null)
+	            	{
+	            		JSONObject parameters = (JSONObject) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
+		            	job.setParameters(parameters);
+	            	}           	
+	        		addJob(job);
             	}
-            	if(jsonJob.get(JSON_KEY_JOB_SCHEDULED_START_TIME)!=null)
+            	else
             	{
-            		String parts[] = ((String) jsonJob.get(JSON_KEY_JOB_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
-            		if(parts.length==3)
+            		if(!fileOk)
             		{
-            			int hours = Integer.parseInt(parts[0]);
-            			int minutes = Integer.parseInt(parts[1]);
-            			int seconds = Integer.parseInt(parts[2]);
-            			job.setScheduledStartTime(new Time(hours,minutes,seconds));
+            			System.out.println(sdf.format(new Date()) + " - error: the file [" + jobName + "] in folder [" + jobPath + "] is not existing or can not be read. skipping data.");
             		}
-            		else
-            		{
-            			throw new Exception("invalid scheduled start time definition. correct format is: [HH:mm:ss]");
-            		}
+            		else if(jobId == null)
+	                {
+            			System.out.println(sdf.format(new Date()) + " -  error: job id is undefined. skipping data.");
+	                }
             	}
-            	if(jsonJob.get(JSON_KEY_JOB_CHECK_INTERVAL)!=null)
-            	{
-            		job.setCheckInterval((long) jsonJob.get(JSON_KEY_JOB_CHECK_INTERVAL));	
-            	}
-            	if(jsonJob.get(JSON_KEY_JOB_LOG_LEVEL)!=null)
-            	{
-            		job.setLogLevel((String) jsonJob.get(JSON_KEY_JOB_LOG_LEVEL));	
-            	}
-            	if(jsonJob.get(JSON_KEY_JOB_MAX_CHECK_INTERVALS)!=null)
-            	{
-            		job.setMaxCheckIntervals((long) jsonJob.get(JSON_KEY_JOB_MAX_CHECK_INTERVALS));	
-            	}
-            	if(jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB)!=null)
-            	{
-            		JSONArray dependentJobs = (JSONArray) jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB);
-            		for(int i=0;i< dependentJobs.size();i++)
-                	{
-            			JSONObject dependentJob = (JSONObject) dependentJobs.get(i);
-            			job.addDependentJob((String) dependentJob.get(JSON_KEY_JOB__DEPENDENT_JOB_ID));
-            		}
-            	}
-            	if(jsonJob.get(JSON_KEY_JOB_PARAMETERS)!=null)
-            	{
-            		JSONObject parameters = (JSONObject) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
-	            	job.setParameters(parameters);
-            	}           	
-        		addJob(job);
             }
 		}
 		catch(Exception ex)
