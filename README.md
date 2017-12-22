@@ -1,7 +1,9 @@
 # jobrunner
 Program to run Pentaho Data Integration ETL jobs and reports. Allows to chain ETL's so that a job only runs, if the dependent job has finished. It is a client/server architecture where the server handles the jobs and execution of jobs and the client sends messages (tasks) to the server. All tasks are multi-threaded - they run as a seperate process.
 
-The idea is that the messages that can be sent to the server are triggered by an existing scheduler such as cron. The server only coordinates the execution of the jobs but does not do the scheduling itself. The json file with the job definitions contains a scheduled start time for each job. This is the planned time when the job should run. When the server is triggered from the external scheduler, the job is run when the scheduled start time is at or before the given time on the same day. If the job has another job defined that it depends on, the job will not start until the dependent job has finished.
+The idea is that the messages that can be sent to the server are triggered by an existing scheduler such as cron. The server only coordinates the execution of the jobs but does not do the scheduling itself. But this takes the complexity of chaining (timing) ETL processes away from scripts, cron or other methods and delegates it to the coordination server.
+
+The json file with the job definitions contains a scheduled start time for each job. This is the planned time when the job should run. When the server is triggered from the external scheduler, the job is run when the scheduled start time is at or before the given time on the same day. If the job has another job defined that it depends on, the job will not start until the dependent job has finished.
 
 The resetjobs message will reset (reset start, finished times, exit code, etc) all jobs and will set their execution date to the current date. I still have to work on this feature to come up with a good implementation.
 
