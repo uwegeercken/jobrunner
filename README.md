@@ -20,22 +20,23 @@ To get started:
 ./sendmessage.sh uptime
 
 possible messages are:
-- uptime
-- processid
-- hello
-- jobfinished
-- jobcanstart
-- jobstartstatus
-- jobstarttime
-- jobrun
-- jobexitcode
-- jobruntime
-- jobdependencies
-- listjobs
-- resetjobs
-- reloadjobs
+- uptime = check the uptime of the server
+- processid = get the internal processid
+- hello = send greeting
+- jobfinished = check if the job has finished
+- jobcanstart = check if the job can start: scheduled time is reached and dependent jobs have finished
+- jobstartstatus = same as before but returing an integer value.
+- jobstarttime = check when the job started
+- jobrun = run the job
+- jobexitcode = check the job exit code
+- jobruntime = check the runtime of the job
+- jobdependencies = list the dependent jobs
+- jobreset = reset values of the job: actual start time, finished time, exit status, set internal job date to the current date
+- resetjobs = same as before but reset all jobs
+- listjobs = list all jobs
+- reloadjobs = reload all jobs from the json file
 
-messages that start with "job" need an extra parameter, which is the job id (see json file):
+messages that start with "job" (jobrun, jobreset, jobfinished, etc) need an extra parameter, which is the job id (see json file):
 
 ./sendmessage.sh jobcanstart:id_0001
 

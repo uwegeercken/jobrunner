@@ -46,7 +46,7 @@ public class ClientHandler extends Thread
     
     // list of possible messages
     // the "exit" message is explicitly excluded here
-    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "listjobs", "resetjobs", "reloadjobs"};
+    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "jobreset", "listjobs", "resetjobs", "reloadjobs"};
     
     public static final String RESPONSE_UPTIME 				= "uptime";
     public static final String RESPONSE_EXIT 				= "exit";
@@ -57,6 +57,7 @@ public class ClientHandler extends Thread
     public static final String RESPONSE_JOB_START_STATUS	= "jobstartstatus";
     public static final String RESPONSE_JOB_STARTTIME		= "jobstarttime";
     public static final String RESPONSE_JOB_RUNTIME			= "jobruntime";
+    public static final String RESPONSE_JOB_RESET			= "jobreset";
     public static final String RESPONSE_RESET_JOBS			= "resetjobs";
     public static final String RESPONSE_RELOAD_JOBS			= "reloadjobs";
     public static final String RESPONSE_LIST_JOBS			= "listjobs";
@@ -218,6 +219,20 @@ public class ClientHandler extends Thread
             			
             			systemMessage("reset jobs. set schedules to current date");
     	                sendClientMessage("ok");
+            		}
+            		else if(serverObject.startsWith(RESPONSE_JOB_RESET))
+            		{
+            			String jobId = parseJobId(serverObject);
+            			Job job = jobManager.getJob(jobId);
+        				if(job!=null)
+        				{
+        					jobManager.resetJob(job);
+        					sendClientMessage(jobId, "reset" );
+        				}
+            			else
+            			{
+            				sendClientMessage(jobId, "not existing");
+            			}
             		}
             		else if(serverObject.startsWith(RESPONSE_RELOAD_JOBS))
             		{
