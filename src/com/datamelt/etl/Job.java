@@ -175,10 +175,20 @@ public class Job implements Comparable<Job>
 	}
 	
 	@Override
-	public int compareTo(Job arg0)
+	public int compareTo(Job job)
 	{
-		// TODO implement method to compare jobs for sorting by time
-		return 0;
+		if(this.getScheduledStartTime().getTimeInMillis() == job.getScheduledStartTime().getTimeInMillis())
+		{
+			return 0;
+		}
+		if(this.getScheduledStartTime().getTimeInMillis() > job.getScheduledStartTime().getTimeInMillis())
+		{
+			return 1;
+		}
+		else
+		{
+			return -1;	
+		}
 	}
 
 	public long getCheckInterval()

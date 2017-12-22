@@ -27,6 +27,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class ClientHandler extends Thread
     
     // list of possible messages
     // the "exit" message is explicitly excluded here
-    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "jobreset", "listjobs", "resetjobs", "reloadjobs"};
+    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "jobreset", "jobremove", "listjobs", "resetjobs", "reloadjobs", "numberofjobs", "nextjob"};
     
     public static final String RESPONSE_UPTIME 				= "uptime";
     public static final String RESPONSE_EXIT 				= "exit";
@@ -59,9 +60,12 @@ public class ClientHandler extends Thread
     public static final String RESPONSE_JOB_STARTTIME		= "jobstarttime";
     public static final String RESPONSE_JOB_RUNTIME			= "jobruntime";
     public static final String RESPONSE_JOB_RESET			= "jobreset";
+    public static final String RESPONSE_JOB_REMOVE			= "jobremove";
     public static final String RESPONSE_RESET_JOBS			= "resetjobs";
     public static final String RESPONSE_RELOAD_JOBS			= "reloadjobs";
+    public static final String RESPONSE_NUMBER_OF_JOBS		= "numberofjobs";
     public static final String RESPONSE_LIST_JOBS			= "listjobs";
+    public static final String RESPONSE_NEXT_JOB			= "nextjob";
     public static final String RESPONSE_JOB_RUN				= "jobrun";
     public static final String RESPONSE_JOB_EXIT_CODE		= "jobexitcode";
     public static final String RESPONSE_JOB_DEPENDENCIES	= "jobdependencies";
@@ -204,9 +208,20 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
+            		else if(serverObject.startsWith(RESPONSE_NEXT_JOB))
+            		{
+            				ArrayList<String> nextJobIds = jobManager.getNextJobs();
+            				String jobId = nextJobIds.get(0);
+            				Job job = jobManager.getJob(jobId);
+        					sendClientMessage("next job(s): " + nextJobIds + " at [" +job.getScheduledStartTime().getTime() + "]");
+            		}
             		else if(serverObject.startsWith(RESPONSE_LIST_JOBS))
             		{
         					sendClientMessage("list of jobs: " + Arrays.deepToString(jobManager.getJobList()));
+            		}
+            		else if(serverObject.startsWith(RESPONSE_NUMBER_OF_JOBS))
+            		{
+        					sendClientMessage("number of jobs: " + jobManager.getNumberOfJobs());
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_EXIT_CODE))
             		{
@@ -218,7 +233,7 @@ public class ClientHandler extends Thread
             		{
             			jobManager.resetJobs();
             			
-            			systemMessage("reset jobs. set schedules to current date");
+            			systemMessage("reset jobs. schedules set to current date");
     	                sendClientMessage("ok");
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_RESET))
@@ -228,7 +243,21 @@ public class ClientHandler extends Thread
         				if(job!=null)
         				{
         					jobManager.resetJob(job);
-        					sendClientMessage(jobId, "reset" );
+        					sendClientMessage(jobId, "reset");
+        				}
+            			else
+            			{
+            				sendClientMessage(jobId, "not existing");
+            			}
+            		}
+            		else if(serverObject.startsWith(RESPONSE_JOB_REMOVE))
+            		{
+            			String jobId = parseJobId(serverObject);
+            			Job job = jobManager.getJob(jobId);
+        				if(job!=null)
+        				{
+        					jobManager.removeJob(jobId);
+        					sendClientMessage(jobId, "removed");
         				}
             			else
             			{

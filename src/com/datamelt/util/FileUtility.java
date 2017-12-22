@@ -19,7 +19,6 @@
 package com.datamelt.util;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -77,23 +76,6 @@ public class FileUtility
     }
     
     /**
-     * returns a array of xml files that are in the specified
-     * folder.
-     * only files that end in .xml are returned.
-     *   
-     * @param folder		the name of the folder where the xml files are stored
-     * @return				list of xml files
-     */
-    public static File[] getXmlFiles(String folder)
-    {
-    	 File dir = new File(folder);
-         File[] fileList = dir.listFiles(new FilenameFilter() {
-             public boolean accept(File f, String s) {return s.endsWith(XML_FILE_EXTENSION);}
-         	});
-         return fileList;
-    }
-    
-    /**
      * returns a array of files that are in the specified folder.
      * 
      * @param folder	the name of the folder where the xml files are stored
@@ -111,7 +93,7 @@ public class FileUtility
      * @param folder	the name of the folder
      * @return			the name of the folder with a slash character at the end
      */
-    public static String adjustSlash(String folder)
+    public static String addTrailingSlash(String folder)
     {
     	if(folder.endsWith("/"))
     	{
@@ -132,7 +114,7 @@ public class FileUtility
      */
     public static boolean fileExists(String folder, String filename)
     {
-    	String fullFilename = adjustSlash(folder) + filename;
+    	String fullFilename = addTrailingSlash(folder) + filename;
     	File file = new File(fullFilename);
     	if(file.exists() && file.isFile())
     	{
@@ -163,7 +145,7 @@ public class FileUtility
     	}
     }
     
-    public static void mkDirs(String folder)
+    public static void createFolders(String folder)
     {
     	if(folder!=null && !folder.trim().equals(""))
     	{

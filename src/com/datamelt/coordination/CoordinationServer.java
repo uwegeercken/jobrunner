@@ -81,7 +81,7 @@ public class CoordinationServer extends Thread
     
     private void loadProperties() throws IOException
     {
-    	propertiesFileFullname = FileUtility.adjustSlash(CoordinationServer.class.getClassLoader().getResource("").getPath()) + PROPERTIES_FILE;
+    	propertiesFileFullname = FileUtility.addTrailingSlash(CoordinationServer.class.getClassLoader().getResource("").getPath()) + PROPERTIES_FILE;
     	properties.load(CoordinationServer.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE));
     }
     
@@ -126,7 +126,7 @@ public class CoordinationServer extends Thread
     
     private void createFolders()
     {
-    	FileUtility.mkDirs(getProperty(PROPERTY_FOLDER_LOGS));
+    	FileUtility.createFolders(getProperty(PROPERTY_FOLDER_LOGS));
     }
     
     private void createSocket() throws IOException

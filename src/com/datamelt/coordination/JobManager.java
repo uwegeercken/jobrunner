@@ -121,7 +121,7 @@ public class JobManager
 	{
 		if(path!=null && jobName!=null)
 		{
-			String fullFilename = FileUtility.adjustSlash(path) + jobName;
+			String fullFilename = FileUtility.addTrailingSlash(path) + jobName;
 			File file = new File(fullFilename);
 			if(file.exists() && file.isFile() && file.canRead())
 			{
@@ -142,24 +142,29 @@ public class JobManager
 	public void removeJob(String jobId)
 	{
 		int counter=0;
-		for(Job job : jobs.getJobs())
+		if(jobId!=null)
 		{
-			if(job.getJobId().equals(jobId))
+			for(Job job : jobs.getJobs())
 			{
-				jobs.removeJob(counter);;
+				if(job.getJobId().equals(jobId))
+				{
+					jobs.removeJob(counter);;
+				}
+				counter++;
 			}
-			counter++;
 		}
-		
 	}
 
 	public Report getReport(String reportId)
 	{
-		for(Report report : reports.getReports())
+		if(reportId!=null)
 		{
-			if(report.getReportId().equals(reportId))
+			for(Report report : reports.getReports())
 			{
-				return report;
+				if(report.getReportId().equals(reportId))
+				{
+					return report;
+				}
 			}
 		}
 		return null;
@@ -168,13 +173,16 @@ public class JobManager
 	public void removeReport(String reportId)
 	{
 		int counter=0;
-		for(Report report : reports.getReports())
+		if(reportId!=null)
 		{
-			if(report.getReportId().equals(reportId))
+			for(Report report : reports.getReports())
 			{
-				reports.removeReport(counter);;
+				if(report.getReportId().equals(reportId))
+				{
+					reports.removeReport(counter);;
+				}
+				counter++;
 			}
-			counter++;
 		}
 	}
 	
@@ -187,6 +195,8 @@ public class JobManager
 	private void loadJobs() throws Exception
 	{
 		JSONParser parser = new JSONParser();
+		// capture all job ids
+		ArrayList<String> jobIds = new ArrayList<String>(); 
 		
 		try
 		{
@@ -204,11 +214,20 @@ public class JobManager
             	String jobName = (String) jsonJob.get(JSON_KEY_JOB_NAME);
             	String jobPath = (String) jsonJob.get(JSON_KEY_JOB_PATH);
 
+            	boolean idExists = false;
+            	
+            	if(jobId!=null && !jobId.trim().equals(""))
+            	{
+            		idExists = jobIds.contains(jobId);
+            	}
+            	
             	boolean fileOk = checkFileOk(jobPath, jobName);
             	
-            	if(jobId!= null && fileOk)
+            	if(jobId!= null && fileOk & !idExists)
             	{
-	            	Job job = new Job(jobId,jobName,jobPath);
+	            	jobIds.add(jobId);
+            		
+            		Job job = new Job(jobId,jobName,jobPath);
 	            	
 	            	if(jsonJob.get(JSON_KEY_JOB_RUN_REPORTS)!=null)
 	            	{
@@ -266,6 +285,10 @@ public class JobManager
             		else if(jobId == null)
 	                {
             			System.out.println(sdf.format(new Date()) + " -  error: job id is undefined. skipping data.");
+	                }
+            		else if(idExists)
+	                {
+            			System.out.println(sdf.format(new Date()) + " -  error: job id [" + jobId + "] is defined multiple times. skipping data.");
 	                }
             	}
             }
@@ -405,4 +428,35 @@ public class JobManager
 		this.folderLogfiles = folderLogfiles;
 	}
 
+	public int getNumberOfJobs()
+	{
+		return jobs.size();
+	}
+	
+	public ArrayList<String> getNextJobs()
+	{
+		long now = System.currentTimeMillis();
+		long differenceToNow=Long.MAX_VALUE;
+		// list will hold multiple job ids if they start at the same time
+		ArrayList<String> nextJobIds = new ArrayList<String>();
+		for(Job job : jobs.getJobs())
+		{
+			long jobTime = job.getScheduledStartTime().getTimeInMillis();
+			long jobDifferenceToNow = jobTime - now;
+			// check if the difference is greater zero (in the future) and
+			// smaller than what we found before
+			if(jobDifferenceToNow > 0 &&  jobDifferenceToNow < differenceToNow )
+			{
+				differenceToNow = jobDifferenceToNow;
+				// clear current list if smaller value found
+				nextJobIds.clear();
+				nextJobIds.add(job.getJobId());
+			}
+			else if(jobDifferenceToNow == differenceToNow )
+			{
+				nextJobIds.add(job.getJobId());
+			}
+		}
+		return nextJobIds;
+	}
 }
