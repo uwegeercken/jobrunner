@@ -1,0 +1,116 @@
+#######################################################################
+WARNING:  no libwebkitgtk-1.0 detected, some features will be unavailable
+    Consider installing the package with apt-get or yum.
+    e.g. 'sudo apt-get install libwebkitgtk-1.0-0'
+#######################################################################
+OpenJDK 64-Bit Server VM warning: ignoring option MaxPermSize=256m; support was removed in 8.0
+19:40:58,679 INFO  [KarafBoot] Checking to see if org.pentaho.clean.karaf.cache is enabled
+19:40:58,882 INFO  [KarafInstance] 
+*******************************************************************************
+*** Karaf Instance Number: 1 at /opt/pentaho/pdi-ce-7.0.0.0-25/./system/kar ***
+***   af/caches/kitchen/data-1                                              ***
+*** Karaf Port:8802                                                         ***
+*** OSGI Service Port:9051                                                  ***
+*******************************************************************************
+Dez 22, 2017 7:41:00 PM org.apache.karaf.main.Main$KarafLockCallback lockAquired
+INFORMATION: Lock acquired. Setting startlevel to 100
+2017/12/22 19:41:00 - Kitchen - Logging is at level : Minimal
+2017/12/22 19:41:00 - Kitchen - Start of run.
+2017-12-22 19:41:05.666:INFO:oejs.Server:jetty-8.1.15.v20140411
+2017-12-22 19:41:05.712:INFO:oejs.AbstractConnector:Started NIOSocketConnectorWrapper@0.0.0.0:9051
+Dez 22, 2017 7:41:06 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/blueprint/core
+Dez 22, 2017 7:41:06 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/configuration/beans
+Dez 22, 2017 7:41:06 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/configuration/parameterized-types
+Dez 22, 2017 7:41:06 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/configuration/security
+Dez 22, 2017 7:41:06 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://schemas.xmlsoap.org/wsdl/
+Dez 22, 2017 7:41:06 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://www.w3.org/2005/08/addressing
+Dez 22, 2017 7:41:06 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://schemas.xmlsoap.org/ws/2004/08/addressing
+Dez 22, 2017 7:41:06 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-management (149) [org.apache.cxf.management.InstrumentationManager]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-ws-policy (198) [org.apache.cxf.ws.policy.PolicyEngine, org.apache.cxf.policy.PolicyDataEngine, org.apache.cxf.ws.policy.AssertionBuilderRegistry, org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry, org.apache.cxf.ws.policy.PolicyBuilder, org.apache.cxf.ws.policy.PolicyAnnotationListener, org.apache.cxf.ws.policy.attachment.ServiceModelPolicyProvider, org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilderRegistry, org.apache.cxf.ws.policy.attachment.external.EndpointReferenceDomainExpressionBuilder, org.apache.cxf.ws.policy.attachment.external.URIDomainExpressionBuilder, org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider, org.apache.cxf.ws.policy.mtom.MTOMAssertionBuilder, org.apache.cxf.ws.policy.mtom.MTOMPolicyInterceptorProvider]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-transports-http (153) [org.apache.cxf.transport.http.HTTPTransportFactory, org.apache.cxf.transport.http.HTTPWSDLExtensionLoader, org.apache.cxf.transport.http.policy.HTTPClientAssertionBuilder, org.apache.cxf.transport.http.policy.HTTPServerAssertionBuilder, org.apache.cxf.transport.http.policy.NoOpPolicyInterceptorProvider]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-wsdl (184) [org.apache.cxf.wsdl.WSDLManager]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/transports/http/configuration
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-bindings-soap (187) [org.apache.cxf.binding.soap.SoapBindingFactory, org.apache.cxf.binding.soap.SoapTransportFactory]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/blueprint/jaxrs
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/blueprint/jaxrs-client
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-bindings-xml (186) [org.apache.cxf.binding.xml.XMLBindingFactory, org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/blueprint/bindings/soap
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/blueprint/simple
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-frontend-jaxws (189) [org.apache.cxf.jaxws.context.WebServiceContextResourceResolver]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/blueprint/jaxws
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/binding/coloc
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-transports-local (194) [org.apache.cxf.transport.local.LocalTransportFactory]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-bindings-object (195) [org.apache.cxf.binding.object.ObjectBindingFactory]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/blueprint/binding/object
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/policy
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://www.w3.org/ns/ws-policy
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://www.w3.org/2006/07/ws-policy
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://schemas.xmlsoap.org/ws/2004/09/policy
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://www.w3.org/2000/09/xmldsig#
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-ws-addr (215) [org.apache.cxf.ws.addressing.policy.AddressingAssertionBuilder, org.apache.cxf.ws.addressing.policy.UsingAddressingAssertionBuilder, org.apache.cxf.ws.addressing.policy.AddressingPolicyInterceptorProvider, org.apache.cxf.ws.addressing.impl.AddressingWSDLExtensionLoader, org.apache.cxf.ws.addressing.WSAddressingFeature$WSAddressingFeatureApplier, org.apache.cxf.ws.addressing.MAPAggregator$MAPAggregatorLoader]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/ws/addressing
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-ws-security (217) [org.apache.cxf.ws.security.policy.WSSecurityPolicyLoader, org.apache.cxf.ws.security.cache.CacheCleanupListener]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-ws-rm (219) [org.apache.cxf.ws.rm.RMManager, org.apache.cxf.ws.rm.policy.RMPolicyInterceptorProvider, org.apache.cxf.ws.rm.policy.RM10AssertionBuilder, org.apache.cxf.ws.rm.policy.RM12AssertionBuilder, org.apache.cxf.ws.rm.policy.WSRMP12PolicyLoader, org.apache.cxf.ws.rm.policy.MC11PolicyLoader, org.apache.cxf.ws.rm.policy.RSPPolicyLoader]
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://cxf.apache.org/ws/rm/manager
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer register
+INFORMATION: Registered blueprint namespace handler for http://schemas.xmlsoap.org/ws/2005/02/rm/policy
+Dez 22, 2017 7:41:07 PM org.apache.cxf.bus.osgi.CXFExtensionBundleListener addExtensions
+INFORMATION: Adding the extensions from bundle org.apache.cxf.cxf-rt-javascript (220) [org.apache.cxf.javascript.JavascriptServerListener]
+Dez 22, 2017 7:41:07 PM org.pentaho.caching.impl.PentahoCacheManagerFactory$RegistrationHandler$1 onSuccess
+INFORMATION: New Caching Service registered
+2017/12/22 19:41:08 - job_test_01 - Start of job execution
+Dez 22, 2017 7:41:12 PM org.apache.cxf.endpoint.ServerImpl initDestination
+INFORMATION: Setting the server's publish address to be /marketplace
+Dez 22, 2017 7:41:12 PM org.apache.cxf.endpoint.ServerImpl initDestination
+INFORMATION: Setting the server's publish address to be /lineage
+Dez 22, 2017 7:41:12 PM org.apache.cxf.endpoint.ServerImpl initDestination
+INFORMATION: Setting the server's publish address to be /i18n
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/pentaho/pdi-ce-7.0.0.0-25/launcher/../lib/slf4j-log4j12-1.7.7.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/pentaho/pdi-ce-7.0.0.0-25/plugins/pentaho-big-data-plugin/lib/slf4j-log4j12-1.7.3.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2017/12/22 19:41:16 - job_test_01 - Job execution finished
+2017/12/22 19:41:16 - Kitchen - Finished!
+2017/12/22 19:41:16 - Kitchen - Start=2017/12/22 19:41:00.488, Stop=2017/12/22 19:41:16.621
+2017/12/22 19:41:16 - Kitchen - Processing ended after 16 seconds.

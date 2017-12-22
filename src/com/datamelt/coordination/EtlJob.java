@@ -53,14 +53,9 @@ public class EtlJob extends Thread
 	{
 		this.job = job;
 		this.serverPort = serverPort;
-		if(logfileFolder!=null && logfileFolder.trim().equals(""))
+		if(logfileFolder!=null && !logfileFolder.trim().equals(""))
 		{
 			this.logfileFolder = logfileFolder;
-			File folder = new File(this.logfileFolder);
-			if(!folder.exists())
-			{
-				folder.mkdirs();
-			}
 		}
 		else
 		{

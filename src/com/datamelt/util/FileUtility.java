@@ -162,4 +162,13 @@ public class FileUtility
     		return false;
     	}
     }
+    
+    public static void mkDirs(String folder)
+    {
+    	if(folder!=null && !folder.trim().equals(""))
+    	{
+    		File directory = new File(folder);
+    		directory.mkdirs();
+    	}
+    }
 }

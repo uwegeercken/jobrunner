@@ -33,10 +33,10 @@ import java.util.Map;
 
 import com.datamelt.coordination.JobManager;
 import com.datamelt.etl.Job;
+import com.datamelt.util.SystemUtility;
 
 public class ClientHandler extends Thread
 {
-	private String processId;
 	private Socket socket;
     private long clientStart;
     private long serverStart;
@@ -75,13 +75,12 @@ public class ClientHandler extends Thread
     private static String scriptName;
     private static String scriptFolder;
     
-    ClientHandler(String processId, Socket socket, JobManager jobManager, int serverPort, long serverStart) throws Exception
+    ClientHandler(Socket socket, JobManager jobManager, int serverPort, long serverStart) throws Exception
     {
     	this.clientStart = System.currentTimeMillis();
     	this.serverStart = serverStart;
     	this.serverPort = serverPort;
     	this.jobManager = jobManager;
-    	this.processId= processId;
         this.socket = socket;
         
         this.outputStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
@@ -120,8 +119,8 @@ public class ClientHandler extends Thread
             		}
             		else if(serverObject.equals(RESPONSE_PROCESSID))
             		{
-    	                String responseMessage = processId;
-    	                sendClientMessage("client processid: " + responseMessage);
+    	                long pid = getProcessId();
+    	                sendClientMessage("server processid: " + pid);
             		}
             		else if(serverObject.equals(RESPONSE_HELLO))
             		{
@@ -429,9 +428,9 @@ public class ClientHandler extends Thread
     	}
 	}
     
-	public String getProcessId()
+	public long getProcessId()
 	{
-		return processId;
+		return SystemUtility.getPID();
 	}
 
 	public long getClientStart() 
