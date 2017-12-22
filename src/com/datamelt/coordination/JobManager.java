@@ -27,7 +27,7 @@ public class JobManager
 	public static final String JSON_KEY_JOB_LOG_LEVEL						= "log_level";
 	public static final String JSON_KEY_JOB_MAX_CHECK_INTERVALS				= "max_check_intervals";
 	public static final String JSON_KEY_JOB_DEPENDS_ON_JOB					= "depends_on_job";
-	public static final String JSON_KEY_JOB_REQUIRES_DEPENDENT_JOB_FINISHED	= "requires_dependent_job_finished";
+	public static final String JSON_KEY_JOB__DEPENDENT_JOB_ID				= "jobid";
 	public static final String JSON_KEY_JOB_PARAMETERS						= "parameters";
 	public static final String JSON_KEY_JOB_PARAMETER						= "parameter";
 		
@@ -37,7 +37,7 @@ public class JobManager
 	public static final int STATUS_SCHEDULED_TIME_NOT_REACHED 	= 2;
 	public static final int STATUS_DEPENDENT_JOB_NOT_FINISHED 	= 3;
 	
-	public static final String[] JOB_STATUS 					= {"undefined","can start","scheduled time not reached","dependent job not finished"};
+	public static final String[] JOB_STATUS 					= {"undefined","can start","scheduled time not reached","dependent job(s) not finished"};
 	
 	public static final String TIME_DELIMITER					= ":";
 	
@@ -78,6 +78,17 @@ public class JobManager
 			}
 		}
 		return null;
+	}
+	
+	public String[] getJobList()
+	{
+		String[] list = new String[jobs.size()];
+		for(int i=0;i<jobs.size();i++)
+		{
+			Job job = jobs.getJob(i);
+			list[i] = job.getJobId();
+		}
+		return list;
 	}
 
 	public void removeJob(String jobId)
@@ -180,25 +191,17 @@ public class JobManager
             	}
             	if(jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB)!=null)
             	{
-            		job.setDependentJobId((String) jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB));
-            	}
-            	if(jsonJob.get(JSON_KEY_JOB_REQUIRES_DEPENDENT_JOB_FINISHED)!=null)
-            	{
-            		job.setRequiresDependentJobFinished((boolean) jsonJob.get(JSON_KEY_JOB_REQUIRES_DEPENDENT_JOB_FINISHED));
+            		JSONArray dependentJobs = (JSONArray) jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB);
+            		for(int i=0;i< dependentJobs.size();i++)
+                	{
+            			JSONObject dependentJob = (JSONObject) dependentJobs.get(i);
+            			job.addDependentJob((String) dependentJob.get(JSON_KEY_JOB__DEPENDENT_JOB_ID));
+            		}
             	}
             	if(jsonJob.get(JSON_KEY_JOB_PARAMETERS)!=null)
             	{
-	            	
-            		//JSONArray parameters = (JSONArray) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
             		JSONObject parameters = (JSONObject) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
 	            	job.setParameters(parameters);
-	            	for(int i=0;i<parameters.size();i++)
-	            	{
-	            		//JSONObject jobParameter = (JSONObject) parameters.get(i);
-	            		
-	            		//String parameter = jobParameter.get(JSON_KEY_JOB_PARAMETER).toString();
-	            		//job.getParameters().add(parameters);
-	            	}
             	}           	
         		addJob(job);
             }
@@ -285,10 +288,22 @@ public class JobManager
 		}
 		else
 		{
-			Job dependentJob = getJob(job.getDependentJobId());
-			if(dependentJob!=null && !dependentJob.isFinished())
+			ArrayList<String> dependentJobs = job.getDependentJobs();
+			if(dependentJobs!=null && dependentJobs.size()>0)
 			{
-				status = STATUS_DEPENDENT_JOB_NOT_FINISHED;
+				for(int i=0;i<dependentJobs.size();i++)
+				{
+					Job dependentJob = getJob(dependentJobs.get(i));
+					if(dependentJob!=null && !dependentJob.isFinished())
+					{
+						status = STATUS_DEPENDENT_JOB_NOT_FINISHED;
+						break;
+					}
+					else
+					{
+						status = STATUS_JOB_CAN_START;
+					}
+				}
 			}
 			else
 			{

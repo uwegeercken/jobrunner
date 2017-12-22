@@ -27,6 +27,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class ClientHandler extends Thread
     
     // list of possible messages
     // the "exit" message is explicitly excluded here
-    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "resetjobs", "reloadjobs"};
+    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "listjobs", "resetjobs", "reloadjobs"};
     
     public static final String RESPONSE_UPTIME 				= "uptime";
     public static final String RESPONSE_EXIT 				= "exit";
@@ -58,8 +59,10 @@ public class ClientHandler extends Thread
     public static final String RESPONSE_JOB_RUNTIME			= "jobruntime";
     public static final String RESPONSE_RESET_JOBS			= "resetjobs";
     public static final String RESPONSE_RELOAD_JOBS			= "reloadjobs";
+    public static final String RESPONSE_LIST_JOBS			= "listjobs";
     public static final String RESPONSE_JOB_RUN				= "jobrun";
     public static final String RESPONSE_JOB_EXIT_CODE		= "jobexitcode";
+    public static final String RESPONSE_JOB_DEPENDENCIES	= "jobdependencies";
     
     public static final String DELIMITER					= ":";
     
@@ -185,6 +188,23 @@ public class ClientHandler extends Thread
             			{
             				sendClientMessage(jobId, "not existing");
             			}
+            		}
+            		else if(serverObject.startsWith(RESPONSE_JOB_DEPENDENCIES))
+            		{
+            			String jobId = parseJobId(serverObject);
+        				Job job = jobManager.getJob(jobId);
+        				if(job!=null)
+        				{
+        					sendClientMessage(jobId, "depends on: " + job.getDependentJobs().toString());
+        				}
+            			else
+            			{
+            				sendClientMessage(jobId, "not existing");
+            			}
+            		}
+            		else if(serverObject.startsWith(RESPONSE_LIST_JOBS))
+            		{
+        					sendClientMessage("list of jobs: " + Arrays.deepToString(jobManager.getJobList()));
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_EXIT_CODE))
             		{

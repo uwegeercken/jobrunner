@@ -1,5 +1,6 @@
 package com.datamelt.etl;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import org.json.simple.JSONObject;
 
@@ -16,7 +17,6 @@ public class Job implements Comparable<Job>
 	private Time scheduledStartTime;
 	private Time actualStartTime;
 	private Time finishedTime;
-	private String dependentJobId;
 	private boolean requiresDependentJobFinished 	= false;
 	private boolean runReports 						= false;
 	private boolean running							= false;
@@ -28,6 +28,7 @@ public class Job implements Comparable<Job>
 	private String logLevel							= "Basic";
 	private int exitCode							= 0;
 	private JSONObject parameters;
+	private ArrayList<String> dependentJobs			= new ArrayList<String>();
 	
 	public Job(String id, String name, String path)
 	{
@@ -41,7 +42,7 @@ public class Job implements Comparable<Job>
 		this.jobId = id;
 		this.jobName = name;
 		this.path = path;
-		this.dependentJobId = dependentJobId;
+		this.dependentJobs.add(dependentJobId);
 	}
 	
 	public String getJobId()
@@ -99,16 +100,21 @@ public class Job implements Comparable<Job>
 		this.scheduledStartTime = new Time(year, month, day, hour, minute, second);
 	}
 	
-	public String getDependentJobId()
+	public ArrayList<String> getDependentJobs()
 	{
-		return dependentJobId;
+		return dependentJobs;
 	}
 
-	public void setDependentJobId(String dependentJobId)
+	public void setDependentJobs(ArrayList<String> dependentJobs)
 	{
-		this.dependentJobId = dependentJobId;
+		this.dependentJobs = dependentJobs;
 	}
 
+	public void addDependentJob(String jobId)
+	{
+		dependentJobs.add(jobId);
+	}
+	
 	public boolean getRequiresDependentJobFinished()
 	{
 		return requiresDependentJobFinished;

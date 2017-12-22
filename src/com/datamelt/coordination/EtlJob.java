@@ -92,12 +92,12 @@ public class EtlJob extends Thread
 				else if(jobStatus==JobManager.STATUS_DEPENDENT_JOB_NOT_FINISHED && job.getCheckIntervalCounter() < job.getMaxCheckIntervals())
 				{
 					job.setCheckIntervalCounter(job.getCheckIntervalCounter()+1);
-					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] - waiting for dependent job to finish. retries left: " + (job.getMaxCheckIntervals() - job.getCheckIntervalCounter()));
+					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] - waiting for dependent job(s) to finish. retries left: " + (job.getMaxCheckIntervals() - job.getCheckIntervalCounter()));
 					sleep(job.getCheckInterval());
 				}
 				else if(jobStatus!=JobManager.STATUS_JOB_CAN_START)
 				{
-					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] - dependent job not finished and max check intervals is reached");
+					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] - dependent job(s) not finished and max check intervals is reached");
 					break;
 				}
 			}
