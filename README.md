@@ -28,6 +28,8 @@ possible messages are:
 - jobrun
 - jobexitcode
 - jobruntime
+- jobdependencies
+- listjobs
 - resetjobs
 - reloadjobs
 
