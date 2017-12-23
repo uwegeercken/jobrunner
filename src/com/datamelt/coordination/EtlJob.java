@@ -67,15 +67,10 @@ public class EtlJob extends Thread
 	{
 		ArrayList <String>parameters = new ArrayList<String>();
 		parameters.add(scriptFolder +"/" + scriptName);
-		parameters.add("-file=" + job.getPath() +"/" + job.getJobName());
-
-    	for(Object key: job.getParameters().keySet())
-    	{
-    		String value= (String) job.getParameters().get(key);
-    		parameters.add("-param:" + key + "=" + value);
-    	}
-        	
+		parameters.add("-file=" + job.getPath() +"/" + job.getJobFilename());
 		parameters.add("-level=" + job.getLogLevel());
+		
+    	parameters.addAll(job.getParameters());
 		
 		ProcessBuilder pb = new ProcessBuilder(parameters);
 		
@@ -103,18 +98,18 @@ public class EtlJob extends Thread
 				jobStatus = (int)client.getServerMessage(ClientHandler.RESPONSE_JOB_START_STATUS + ClientHandler.DELIMITER + job.getJobId());
 				if(jobStatus==JobManager.STATUS_SCHEDULED_TIME_NOT_REACHED)
 				{
-					//System.out.println(sdf.format(new Date()) + " - [" + job.getJobId()+ "]: job scheduled start time not reached: " + job.getScheduledStartTime().getTime());
+					//System.out.println(sdf.format(new Date()) + " - [" + job.getJobId()+ "] job scheduled start time not reached: " + job.getScheduledStartTime().getTime());
 					sleep(job.getCheckInterval());
 				}
 				else if(jobStatus==JobManager.STATUS_DEPENDENT_JOB_NOT_FINISHED && job.getCheckIntervalCounter() < job.getMaxCheckIntervals())
 				{
 					job.setCheckIntervalCounter(job.getCheckIntervalCounter()+1);
-					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] - waiting for dependent job(s) to finish. retries left: " + (job.getMaxCheckIntervals() - job.getCheckIntervalCounter()));
+					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] waiting for dependent job(s) to finish. interval: [" + job.getCheckIntervalSeconds() + "] seconds, retries left: [" + (job.getMaxCheckIntervals() - job.getCheckIntervalCounter())+"]");
 					sleep(job.getCheckInterval());
 				}
 				else if(jobStatus!=JobManager.STATUS_JOB_CAN_START)
 				{
-					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] - dependent job(s) not finished and max check intervals is reached");
+					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] dependent job(s) not finished and max check intervals is reached");
 					break;
 				}
 			}

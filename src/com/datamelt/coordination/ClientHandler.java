@@ -48,7 +48,7 @@ public class ClientHandler extends Thread
     
     // list of possible messages
     // the "exit" message is explicitly excluded here
-    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "jobreset", "jobremove", "listjobs", "resetjobs", "reloadjobs", "numberofjobs", "nextjob"};
+    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "jobreset", "jobremove", "jobjson", "listjobs", "resetjobs", "reloadjobs", "numberofjobs", "nextjob"};
     
     public static final String RESPONSE_UPTIME 				= "uptime";
     public static final String RESPONSE_EXIT 				= "exit";
@@ -61,6 +61,7 @@ public class ClientHandler extends Thread
     public static final String RESPONSE_JOB_RUNTIME			= "jobruntime";
     public static final String RESPONSE_JOB_RESET			= "jobreset";
     public static final String RESPONSE_JOB_REMOVE			= "jobremove";
+    public static final String RESPONSE_JOB_JSON			= "jobjson";
     public static final String RESPONSE_RESET_JOBS			= "resetjobs";
     public static final String RESPONSE_RELOAD_JOBS			= "reloadjobs";
     public static final String RESPONSE_NUMBER_OF_JOBS		= "numberofjobs";
@@ -118,17 +119,17 @@ public class ClientHandler extends Thread
             		}
             		else if(serverObject.equals(RESPONSE_UPTIME))
             		{
-    	                String responseMessage = getRunTime(System.currentTimeMillis(),serverStart);
+    	                String responseMessage = "uptime " + getRunTime(System.currentTimeMillis(),serverStart);
     	                sendClientMessage(responseMessage);
             		}
             		else if(serverObject.equals(RESPONSE_PROCESSID))
             		{
     	                long pid = getProcessId();
-    	                sendClientMessage("server processid: " + pid);
+    	                sendClientMessage("server processid: [" + pid + "]");
             		}
             		else if(serverObject.equals(RESPONSE_HELLO))
             		{
-    	                sendClientMessage(RESPONSE_HELLO + " client from: " + socket.getInetAddress().toString());
+    	                sendClientMessage(RESPONSE_HELLO + " client from: [" + socket.getInetAddress().toString() + "]");
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_CAN_START))
             		{
@@ -136,7 +137,7 @@ public class ClientHandler extends Thread
             			int jobStatus = jobManager.getJobStatus(jobId);
             			if(jobStatus != JobManager.STATUS_UNDEFINED)
             			{
-            				sendClientMessage(JobManager.JOB_STATUS[jobStatus]);
+            				sendClientMessage("status: [" + JobManager.JOB_STATUS[jobStatus] + "]");
             			}
             			else
             			{
@@ -163,6 +164,19 @@ public class ClientHandler extends Thread
             			if(jobStarttime!=null)
             			{
             				sendClientMessage(jobStarttime);
+            			}
+            			else
+            			{
+            				sendClientMessage(jobId, "not existing");
+            			}
+            		}
+            		else if(serverObject.startsWith(RESPONSE_JOB_JSON))
+            		{
+            			String jobId = parseJobId(serverObject);
+        				Job job = jobManager.getJob(jobId);
+        				if(job!=null)
+        				{
+        					sendMessage(jobManager.getJobAsJson(jobId));
             			}
             			else
             			{
@@ -228,7 +242,7 @@ public class ClientHandler extends Thread
             		}
             		else if(serverObject.startsWith(RESPONSE_NUMBER_OF_JOBS))
             		{
-        					sendClientMessage("number of jobs: " + jobManager.getNumberOfJobs());
+        					sendClientMessage("number of jobs: [" + jobManager.getNumberOfJobs() + "]");
             		}
             		else if(serverObject.startsWith(RESPONSE_JOB_EXIT_CODE))
             		{
@@ -286,11 +300,11 @@ public class ClientHandler extends Thread
             			{
             				if(job.isFinished())
             				{
-            					sendClientMessage(jobId,job.isFinished() + " - " + job.getFinishedTime().getTime());
+            					sendClientMessage(jobId,"finished [" + job.getFinishedTime().getTime() + "]");
             				}
             				else
             				{
-            					sendClientMessage(jobId, "finished: " + job.isFinished());
+            					sendClientMessage(jobId, "not finished");
             				}
             			}
             			else

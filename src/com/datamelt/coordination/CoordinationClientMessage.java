@@ -54,7 +54,7 @@ public class CoordinationClientMessage
 					CoordinationClient client = new CoordinationClient(hostname,port);
 			    	
 					Object response = client.getServerMessage(message);
-			    	System.out.println("server response: " + response.toString());
+			    	System.out.println(response.toString());
 			    	
 			    	// send an exit signal
 			    	client.getServerMessage(ClientHandler.RESPONSE_EXIT);
@@ -73,7 +73,6 @@ public class CoordinationClientMessage
 				System.out.println("error: message is undefined - exiting");
 			}
 		}
-		System.out.println();
     }
 	
 	private static boolean checkMessageValidity(String message)

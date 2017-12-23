@@ -2,12 +2,13 @@
 	"jobs":	[
 			{
 				"id": "id_0001",
-				"name": "job_test_01.kjb",
+				"name": "ETL Job 1",
+				"filename": "job_test_01.kjb",
 				"path": "/home/uwe/development/git/jobrunner/pdi",
 				"scheduled_start_time": "23:16:00",
 				"check_interval": 3000,
 				"max_check_intervals": 5,
-				"parameters": {"jobnumber": "1","test": "xx"},
+				"parameters": {"jobnumber": "1","year": "${year}",,"month": "${month:-3}"},
 				"log_level": "Minimal",
 				"run_reports": true,
 				"reports": [
@@ -16,7 +17,8 @@
 			},
 			{
 				"id": "id_0002",
-				"name": "job_test_02.kjb",
+				"name": "ETL Job  2",
+				"filename": "job_test_02.kjb",
 				"path": "/home/uwe/development/git/jobrunner/pdi",
 				"scheduled_start_time": "00:03:01",
 				"check_interval": 3000,
@@ -33,7 +35,8 @@
 			},
 			{
 				"id": "id_0003",
-				"name": "job_test_03.kjb",
+				"name": "ETL Job 3",
+				"filename": "job_test_03.kjb",
 				"path": "/home/uwe/development/git/jobrunner/pdi",
 				"scheduled_start_time": "00:12:00",
 				"check_interval": 10000,

@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.json.simple.JSONArray;
@@ -35,12 +36,15 @@ import com.datamelt.etl.Job;
 import com.datamelt.etl.JobCollection;
 import com.datamelt.etl.Report;
 import com.datamelt.etl.ReportCollection;
+import com.datamelt.util.DateTimeUtility;
 import com.datamelt.util.FileUtility;
 import com.datamelt.util.Time;
+import com.datamelt.util.VariableReplacer;
 
 public class JobManager
 {
 	public static final String JSON_KEY_JOB_ID						= "id";
+	public static final String JSON_KEY_JOB_FILENAME				= "filename";
 	public static final String JSON_KEY_JOB_NAME					= "name";
 	public static final String JSON_KEY_JOB_PATH					= "path";
 	public static final String JSON_KEY_JOBS						= "jobs";
@@ -71,6 +75,8 @@ public class JobManager
 	private ReportCollection reports 								= new ReportCollection();
 	private String jobFilename										= null;
 	private String folderLogfiles									= null;
+	
+	private HashMap<String,String> jsonJobs							= new HashMap<String,String>();
 	
 	public JobManager(String filename) throws Exception
 	{
@@ -104,6 +110,18 @@ public class JobManager
 			}
 		}
 		return null;
+	}
+	
+	public String getJobAsJson(String jobId)
+	{
+		if(jobId!=null && jsonJobs.containsKey(jobId))
+		{
+			return jsonJobs.get(jobId);
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	public String[] getJobList()
@@ -211,7 +229,7 @@ public class JobManager
             	JSONObject jsonJob = iterator.next();
             	
             	String jobId = (String) jsonJob.get(JSON_KEY_JOB_ID);
-            	String jobName = (String) jsonJob.get(JSON_KEY_JOB_NAME);
+            	String jobFilename = (String) jsonJob.get(JSON_KEY_JOB_FILENAME);
             	String jobPath = (String) jsonJob.get(JSON_KEY_JOB_PATH);
 
             	boolean idExists = false;
@@ -221,15 +239,21 @@ public class JobManager
             		idExists = jobIds.contains(jobId);
             	}
             	
-            	boolean fileOk = checkFileOk(jobPath, jobName);
+            	boolean fileOk = checkFileOk(jobPath, jobFilename);
             	
             	if(jobId!= null && fileOk & !idExists)
             	{
-	            	jobIds.add(jobId);
+	            	jsonJobs.put(jobId,jsonJob.toString());
             		
-            		Job job = new Job(jobId,jobName,jobPath);
+            		jobIds.add(jobId);
+            		
+            		Job job = new Job(jobId,jobFilename,jobPath);
 	            	
-	            	if(jsonJob.get(JSON_KEY_JOB_RUN_REPORTS)!=null)
+            		if(jsonJob.get(JSON_KEY_JOB_NAME)!=null)
+	            	{
+	            		job.setJobName((String) jsonJob.get(JSON_KEY_JOB_NAME));	
+	            	}
+            		if(jsonJob.get(JSON_KEY_JOB_RUN_REPORTS)!=null)
 	            	{
 	            		job.setRunReports((boolean) jsonJob.get(JSON_KEY_JOB_RUN_REPORTS));	
 	            	}
@@ -271,7 +295,29 @@ public class JobManager
 	            	}
 	            	if(jsonJob.get(JSON_KEY_JOB_PARAMETERS)!=null)
 	            	{
-	            		JSONObject parameters = (JSONObject) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
+	            		JSONObject jsonParameters = (JSONObject) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
+	            		
+	            		ArrayList<String>parameters = new ArrayList<String>();
+
+	                	for(Object key: jsonParameters.keySet())
+	                	{
+	                		String value = (String) jsonParameters.get(key);
+	                		
+	                		// translate variables to their real value
+	                		if(VariableReplacer.isVariable(value))
+	                		{
+	                			String variableName = VariableReplacer.getVariableName(value);
+	                			int offset = VariableReplacer.getOffset(value);
+	                			int realValue = DateTimeUtility.getFieldValue(variableName,offset);
+	                		
+	                			parameters.add("-param:" + key + "=" + realValue);
+	                		}
+	                		else
+	                		{
+	                			parameters.add("-param:" + key + "=" + value);
+	                		}
+	                	}
+	                	
 		            	job.setParameters(parameters);
 	            	}           	
 	        		addJob(job);
@@ -280,7 +326,7 @@ public class JobManager
             	{
             		if(!fileOk)
             		{
-            			System.out.println(sdf.format(new Date()) + " - error: the file [" + jobName + "] in folder [" + jobPath + "] is not existing or can not be read. skipping data.");
+            			System.out.println(sdf.format(new Date()) + " - error: the file [" + jobFilename + "] in folder [" + jobPath + "] is not existing or can not be read. skipping data.");
             		}
             		else if(jobId == null)
 	                {

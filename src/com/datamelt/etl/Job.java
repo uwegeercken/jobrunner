@@ -21,7 +21,6 @@ package com.datamelt.etl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import org.json.simple.JSONObject;
 
 import com.datamelt.util.Time;
 
@@ -31,6 +30,7 @@ public class Job implements Comparable<Job>
 	private static final int DEFAULT_MAX_CHECK_INTERVALS 	= 10;
 	
 	private String jobId;
+	private String jobFilename;
 	private String jobName;
 	private String path;
 	private Time scheduledStartTime;
@@ -46,20 +46,20 @@ public class Job implements Comparable<Job>
 	private long maxCheckIntervals 					= DEFAULT_MAX_CHECK_INTERVALS;
 	private String logLevel							= "Basic";
 	private int exitCode							= 0;
-	private JSONObject parameters;
+	private ArrayList<String> parameters			= new ArrayList<String>();
 	private ArrayList<String> dependentJobs			= new ArrayList<String>();
 	
-	public Job(String id, String name, String path)
+	public Job(String id, String filename, String path)
 	{
 		this.jobId = id;
-		this.jobName = name;
+		this.jobFilename = filename;
 		this.path = path;
 	}
 	
-	public Job(String id, String name, String path, String dependentJobId)
+	public Job(String id, String filename, String path, String dependentJobId)
 	{
 		this.jobId = id;
-		this.jobName = name;
+		this.jobFilename = filename;
 		this.path = path;
 		this.dependentJobs.add(dependentJobId);
 	}
@@ -74,11 +74,21 @@ public class Job implements Comparable<Job>
 		this.jobId = jobId;
 	}
 	
+	public String getJobFilename()
+	{
+		return jobFilename;
+	}
+	
+	public void setJobFilename(String jobFilename)
+	{
+		this.jobFilename = jobFilename;
+	}
+	
 	public String getJobName()
 	{
 		return jobName;
 	}
-	
+
 	public void setJobName(String jobName)
 	{
 		this.jobName = jobName;
@@ -195,6 +205,11 @@ public class Job implements Comparable<Job>
 	{
 		return checkInterval;
 	}
+	
+	public long getCheckIntervalSeconds()
+	{
+		return checkInterval/1000;
+	}
 
 	public void setCheckInterval(long checkInterval)
 	{
@@ -246,12 +261,12 @@ public class Job implements Comparable<Job>
 		this.finishedTime = finishedTime;
 	}
 
-	public JSONObject getParameters()
+	public ArrayList<String> getParameters()
 	{
 		return parameters;
 	}
 
-	public void setParameters(JSONObject parameters)
+	public void setParameters(ArrayList<String> parameters)
 	{
 		this.parameters = parameters;
 	}
