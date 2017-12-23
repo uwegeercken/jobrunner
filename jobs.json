@@ -8,7 +8,7 @@
 				"scheduled_start_time": "23:16:00",
 				"check_interval": 3000,
 				"max_check_intervals": 5,
-				"parameters": {"jobnumber": "1","year": "${year}",,"month": "${month:-3}"},
+				"parameters": {"jobnumber": "1","year": "${year}","month": "${month:-3}"},
 				"log_level": "Minimal",
 				"run_reports": true,
 				"reports": [
