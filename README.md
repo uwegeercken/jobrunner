@@ -7,6 +7,8 @@ The json file with the job definitions contains a scheduled start time for each 
 
 The resetjobs message will reset (reset start, finished times, exit code, etc) all jobs and will set their execution date to the current date. I still have to work on this feature to come up with a good implementation.
 
+In the parameters section of the job definition JSON file, you can specify dynamic values to automatically calculate the date such as "previous year", "next month" or "four weeks ago". This is calculated from the current date. This way, if the ETL should always run for e.g. the previous month, then the correct date is calculated dynamically.
+
 Settings for the server start are defined in the server.properties file. There are also environment variables that can be passed to the ETL process. The ETL job definitions are defined in the jobs.json file. There are two PDI jobs (.kjb) and a transformation (.ktr). The jobs generate some data and output the data to a file.
 
 To get started:
