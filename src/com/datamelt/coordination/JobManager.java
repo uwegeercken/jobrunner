@@ -332,96 +332,8 @@ public class JobManager
 	                	
 		            	job.setParameters(parameters);
 	            	}
+	            	loadReports(job, jsonJob);
 	            	
-	            	JSONArray reports = (JSONArray) jsonJob.get(JSON_KEY_REPORTS);
-	                Iterator<JSONObject> reportsIterator = reports.iterator();
-	                
-	                ArrayList<String> reportIds = new ArrayList<String>(); 
-	                
-	                while (reportsIterator.hasNext()) 
-	                {
-	                	JSONObject jsonReport = reportsIterator.next();
-	                	
-	                	String reportId = (String) jsonJob.get(JSON_KEY_JOB_ID);
-	                	String reportFilename = (String) jsonJob.get(JSON_KEY_JOB_FILENAME);
-	                	String reportPath = (String) jsonJob.get(JSON_KEY_JOB_PATH);
-
-	                	boolean reportIdExists = false;
-	                	
-	                	if(reportId!=null && !reportId.trim().equals(""))
-	                	{
-	                		reportIdExists = reportIds.contains(reportId);
-	                	}
-	                	
-	                	boolean reportFileOk = checkFileOk(reportPath, reportFilename);
-	                	
-	                	if(reportId!= null && reportFileOk & !reportIdExists)
-	                	{
-	                		reportIds.add(reportId);
-	                		
-	                		Report report = new Report(reportId,reportFilename, reportPath);
-
-	                		if(jsonReport.get(JSON_KEY_REPORT_NAME)!=null)
-	    	            	{
-	    	            		report.setReportName((String) jsonReport.get(JSON_KEY_REPORT_NAME));	
-	    	            	}
-	    	            	if(jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)!=null)
-	    	            	{
-	    	            		String parts[] = ((String) jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
-	    	            		if(parts.length==3)
-	    	            		{
-	    	            			int hours = Integer.parseInt(parts[0]);
-	    	            			int minutes = Integer.parseInt(parts[1]);
-	    	            			int seconds = Integer.parseInt(parts[2]);
-	    	            			report.setScheduledStartTime(new Time(hours,minutes,seconds));
-	    	            		}
-	    	            		else
-	    	            		{
-	    	            			throw new Exception("invalid scheduled start time definition. correct format is: [HH:mm:ss]");
-	    	            		}
-	    	            	}
-	    	            	if(jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL)!=null)
-	    	            	{
-	    	            		report.setCheckInterval((long) jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL));	
-	    	            	}
-	    	            	if(jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS)!=null)
-	    	            	{
-	    	            		report.setMaxCheckIntervals((long) jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS));	
-	    	            	}
-	    	            	if(jsonReport.get(JSON_KEY_REPORT_PARAMETERS)!=null)
-	    	            	{
-	    	            		JSONObject jsonParameters = (JSONObject) jsonReport.get(JSON_KEY_REPORT_PARAMETERS);
-	    	            		
-	    	            		ArrayList<String>parameters = new ArrayList<String>();
-
-	    	                	for(Object key: jsonParameters.keySet())
-	    	                	{
-	    	                		String value = (String) jsonParameters.get(key);
-	    	                		
-	    	                		// translate variables to their real value
-	    	                		if(VariableReplacer.isVariable(value))
-	    	                		{
-	    	                			String variableName = VariableReplacer.getVariableName(value);
-	    	                			int offset = VariableReplacer.getOffset(value);
-	    	                			int realValue = DateTimeUtility.getFieldValue(variableName,offset);
-	    	                		
-	    	                			parameters.add("&" + key + "=" + realValue);
-	    	                		}
-	    	                		else
-	    	                		{
-	    	                			parameters.add("-param:" + key + "=" + value);
-	    	                		}
-	    	                	}
-	    	                	
-	    		            	report.setParameters(parameters);
-	    	            	}
-
-	                		
-	                		
-	                		job.addReport(report);
-	                	}
-	                	
-	                }
 	        		addJob(job);
             	}
             	else
@@ -449,17 +361,107 @@ public class JobManager
 
 	}
 	
-	private void loadReports(Job job)
+	private void loadReports(Job job, JSONObject jsonJob) throws Exception
 	{
-		// load the reports for the specified job
-		
-		Report report = new Report("id_0001", "testReport_1","/home/uwe/development/jobexecutor");
-		report.setScheduledStartTime(2017,12,10,15,30,00);
-		report.setDependentJob(job);
-		report.setRequiresJobFinished(true);
-		
-		addReport(report);
+		JSONArray reports = (JSONArray) jsonJob.get(JSON_KEY_REPORTS);
+        Iterator<JSONObject> reportsIterator = reports.iterator();
+        
+        ArrayList<String> reportIds = new ArrayList<String>(); 
+        
+        while (reportsIterator.hasNext()) 
+        {
+        	JSONObject jsonReport = reportsIterator.next();
+        	
+        	String reportId = (String) jsonReport.get(JSON_KEY_REPORT_ID);
+        	String reportFilename = (String) jsonReport.get(JSON_KEY_REPORT_FILENAME);
+        	String reportPath = (String) jsonReport.get(JSON_KEY_REPORT_PATH);
 
+        	boolean reportIdExists = false;
+        	
+        	if(reportId!=null && !reportId.trim().equals(""))
+        	{
+        		reportIdExists = reportIds.contains(reportId);
+        	}
+        	
+        	boolean reportFileOk = checkFileOk(reportPath, reportFilename);
+        	
+        	if(reportId!= null && reportFileOk & !reportIdExists)
+        	{
+        		reportIds.add(reportId);
+        		
+        		Report report = new Report(reportId,reportFilename, reportPath);
+
+        		if(jsonReport.get(JSON_KEY_REPORT_NAME)!=null)
+            	{
+            		report.setReportName((String) jsonReport.get(JSON_KEY_REPORT_NAME));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)!=null)
+            	{
+            		String parts[] = ((String) jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
+            		if(parts.length==3)
+            		{
+            			int hours = Integer.parseInt(parts[0]);
+            			int minutes = Integer.parseInt(parts[1]);
+            			int seconds = Integer.parseInt(parts[2]);
+            			report.setScheduledStartTime(new Time(hours,minutes,seconds));
+            		}
+            		else
+            		{
+            			throw new Exception("invalid scheduled start time definition. correct format is: [HH:mm:ss]");
+            		}
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL)!=null)
+            	{
+            		report.setCheckInterval((long) jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS)!=null)
+            	{
+            		report.setMaxCheckIntervals((long) jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PARAMETERS)!=null)
+            	{
+            		JSONObject jsonParameters = (JSONObject) jsonReport.get(JSON_KEY_REPORT_PARAMETERS);
+            		
+            		ArrayList<String>parameters = new ArrayList<String>();
+
+                	for(Object key: jsonParameters.keySet())
+                	{
+                		String value = (String) jsonParameters.get(key);
+                		
+                		// translate variables to their real value
+                		if(VariableReplacer.isVariable(value))
+                		{
+                			String variableName = VariableReplacer.getVariableName(value);
+                			int offset = VariableReplacer.getOffset(value);
+                			int realValue = DateTimeUtility.getFieldValue(variableName,offset);
+                		
+                			parameters.add("&" + key + "=" + realValue);
+                		}
+                		else
+                		{
+                			parameters.add("-param:" + key + "=" + value);
+                		}
+                	}
+	            	report.setParameters(parameters);
+            	}
+        		job.addReport(report);
+        	}
+        	else
+        	{
+        		if(!reportFileOk)
+        		{
+        			System.out.println(sdf.format(new Date()) + " - error: in job [" + job.getJobId() + "] the file [" + reportFilename + "] in folder [" + reportPath + "] is not existing or can not be read. skipping data.");
+        		}
+        		else if(reportId == null)
+                {
+        			System.out.println(sdf.format(new Date()) + " -  error: in job [" + job.getJobId() + "] report id is undefined. skipping data.");
+                }
+        		else if(reportIdExists)
+                {
+        			System.out.println(sdf.format(new Date()) + " -  error: in job [" + job.getJobId() + "] report id [" + reportId + "] is defined multiple times. skipping data.");
+                }
+        	}
+        }
 	}
 	
 	private boolean getJobScheduledTimeReached(Job job)
