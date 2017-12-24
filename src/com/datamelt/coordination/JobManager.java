@@ -414,6 +414,10 @@ public class JobManager
             	{
             		report.setCheckInterval((long) jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL));	
             	}
+            	if(jsonReport.get(JSON_KEY_REPORT_TARGET_PATH)!=null)
+            	{
+            		report.setTargetPath((String) jsonReport.get(JSON_KEY_REPORT_TARGET_PATH));	
+            	}
             	if(jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS)!=null)
             	{
             		report.setMaxCheckIntervals((long) jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS));	

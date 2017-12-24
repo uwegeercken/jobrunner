@@ -32,6 +32,7 @@ public class Report implements Comparable<Report>
 	private String reportId;
 	private String reportName;
 	private String path;
+	private String targetPath;
 	private Time scheduledStartTime;
 	private Time actualStartTime;
 	private Time finishedTime;
@@ -87,6 +88,16 @@ public class Report implements Comparable<Report>
 	public void setPath(String path)
 	{
 		this.path = path;
+	}
+
+	public String getTargetPath()
+	{
+		return targetPath;
+	}
+	
+	public void setTargetPath(String targetPath)
+	{
+		this.targetPath = targetPath;
 	}
 
 	public Job getDependentJob()
