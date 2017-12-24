@@ -19,18 +19,30 @@
 
 package com.datamelt.etl;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import com.datamelt.util.Time;
 
 public class Report implements Comparable<Report>
 {
+	private static final long DEFAULT_CHECK_INTERVAL 		= 60000;
+	private static final int DEFAULT_MAX_CHECK_INTERVALS 	= 10;
+	
 	private String reportId;
 	private String reportName;
 	private String path;
-	private Time scheduledTime;
+	private Time scheduledStartTime;
+	private Time actualStartTime;
+	private Time finishedTime;
 	private Job dependentJob;
 	private boolean requiresJobFinished;
+	private long checkInterval 						= DEFAULT_CHECK_INTERVAL;
+	private long checkIntervalCounter				= 0;
+	private long maxCheckIntervals 					= DEFAULT_MAX_CHECK_INTERVALS;
+
+	
+	private ArrayList<String> parameters			= new ArrayList<String>();
 	
 	public Report(String id, String name, String path)
 	{
@@ -77,21 +89,6 @@ public class Report implements Comparable<Report>
 		this.path = path;
 	}
 
-	public Time getScheduledTime()
-	{
-		return scheduledTime;
-	}
-
-	public void setScheduledTime(Calendar scheduledTime)
-	{
-		this.scheduledTime = new Time(scheduledTime);
-	}
-
-	public void setScheduledTime(int year, int month, int day, int hour, int minute, int second)
-	{
-		this.scheduledTime = new Time(year, month, day, hour, minute, second);
-	}
-	
 	public Job getDependentJob()
 	{
 		return dependentJob;
@@ -117,6 +114,71 @@ public class Report implements Comparable<Report>
 		return dependentJob.isFinished();
 	}
 
+	public ArrayList<String> getParameters()
+	{
+		return parameters;
+	}
+
+	public void setParameters(ArrayList<String> parameters)
+	{
+		this.parameters = parameters;
+	}
+	
+	public long getCheckInterval()
+	{
+		return checkInterval;
+	}
+	
+	public long getCheckIntervalSeconds()
+	{
+		return checkInterval/1000;
+	}
+
+	public void setCheckInterval(long checkInterval)
+	{
+		this.checkInterval = checkInterval;
+	}
+
+	public long getMaxCheckIntervals()
+	{
+		return maxCheckIntervals;
+	}
+
+	public void setMaxCheckIntervals(long maxCheckIntervals)
+	{
+		this.maxCheckIntervals = maxCheckIntervals;
+	}
+	
+	public Time getScheduledStartTime()
+	{
+		return scheduledStartTime;
+	}
+
+	public void setScheduledStartTime(Calendar scheduledStartTime)
+	{
+		this.scheduledStartTime = new Time(scheduledStartTime);
+	}
+
+	public Time getActualStartTime()
+	{
+		return actualStartTime;
+	}
+
+	public Time getFinishedTime()
+	{
+		return finishedTime;
+	}
+
+	public void setScheduledStartTime(int year, int month, int day, int hour, int minute, int second)
+	{
+		this.scheduledStartTime = new Time(year, month, day, hour, minute, second);
+	}
+	
+	public void setScheduledStartTime(Time scheduledStartTime)
+	{
+		this.scheduledStartTime = scheduledStartTime;
+	}
+	
 	@Override
 	public int compareTo(Report arg0)
 	{

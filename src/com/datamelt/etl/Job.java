@@ -48,6 +48,7 @@ public class Job implements Comparable<Job>
 	private int exitCode							= 0;
 	private ArrayList<String> parameters			= new ArrayList<String>();
 	private ArrayList<String> dependentJobs			= new ArrayList<String>();
+	private ArrayList<Report> reports				= new ArrayList<Report>();
 	
 	public Job(String id, String filename, String path)
 	{
@@ -142,6 +143,11 @@ public class Job implements Comparable<Job>
 	public void addDependentJob(String jobId)
 	{
 		dependentJobs.add(jobId);
+	}
+	
+	public void addReport(Report report)
+	{
+		reports.add(report);
 	}
 	
 	public boolean getRequiresDependentJobFinished()

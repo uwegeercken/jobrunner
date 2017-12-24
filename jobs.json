@@ -12,7 +12,17 @@
 				"log_level": "Minimal",
 				"run_reports": true,
 				"reports": [
-
+						{
+							"id": "rp_0001",
+							"name": "Report 1",
+							"filename": "report_01.prpt",
+							"path": "????",
+							"target_path": "????",
+							"scheduled_start_time": "23:16:00",
+							"check_interval": 3000,
+							"max_check_intervals": 5,
+							"parameters": {"unit": "abc","day": "${day:-1}"}
+						}
 				]
 			},
 			{

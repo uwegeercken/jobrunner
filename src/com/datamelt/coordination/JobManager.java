@@ -58,6 +58,18 @@ public class JobManager
 	public static final String JSON_KEY_JOB_PARAMETERS				= "parameters";
 	public static final String JSON_KEY_JOB_PARAMETER				= "parameter";
 	
+	public static final String JSON_KEY_REPORTS						= "reports";
+	public static final String JSON_KEY_REPORT_ID					= "id";
+	public static final String JSON_KEY_REPORT_FILENAME				= "filename";
+	public static final String JSON_KEY_REPORT_NAME					= "name";
+	public static final String JSON_KEY_REPORT_PATH					= "path";
+	public static final String JSON_KEY_REPORT_TARGET_PATH			= "target_path";
+	public static final String JSON_KEY_REPORT_SCHEDULED_START_TIME	= "scheduled_start_time";
+	public static final String JSON_KEY_REPORT_CHECK_INTERVAL		= "check_interval";
+	public static final String JSON_KEY_REPORT_MAX_CHECK_INTERVALS	= "max_check_intervals";
+	public static final String JSON_KEY_REPORT_PARAMETERS			= "parameters";
+	public static final String JSON_KEY_REPORT_PARAMETER			= "parameter";
+	
 	private static final String DEFAULT_DATETIME_FORMAT				= "yyyy-MM-dd HH:mm:ss";
     private static SimpleDateFormat sdf								= new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
 	
@@ -214,7 +226,7 @@ public class JobManager
 	{
 		JSONParser parser = new JSONParser();
 		// capture all job ids
-		ArrayList<String> jobIds = new ArrayList<String>(); 
+		ArrayList<String> jobIds = new ArrayList<String>();
 		
 		try
 		{
@@ -319,7 +331,97 @@ public class JobManager
 	                	}
 	                	
 		            	job.setParameters(parameters);
-	            	}           	
+	            	}
+	            	
+	            	JSONArray reports = (JSONArray) jsonJob.get(JSON_KEY_REPORTS);
+	                Iterator<JSONObject> reportsIterator = reports.iterator();
+	                
+	                ArrayList<String> reportIds = new ArrayList<String>(); 
+	                
+	                while (reportsIterator.hasNext()) 
+	                {
+	                	JSONObject jsonReport = reportsIterator.next();
+	                	
+	                	String reportId = (String) jsonJob.get(JSON_KEY_JOB_ID);
+	                	String reportFilename = (String) jsonJob.get(JSON_KEY_JOB_FILENAME);
+	                	String reportPath = (String) jsonJob.get(JSON_KEY_JOB_PATH);
+
+	                	boolean reportIdExists = false;
+	                	
+	                	if(reportId!=null && !reportId.trim().equals(""))
+	                	{
+	                		reportIdExists = reportIds.contains(reportId);
+	                	}
+	                	
+	                	boolean reportFileOk = checkFileOk(reportPath, reportFilename);
+	                	
+	                	if(reportId!= null && reportFileOk & !reportIdExists)
+	                	{
+	                		reportIds.add(reportId);
+	                		
+	                		Report report = new Report(reportId,reportFilename, reportPath);
+
+	                		if(jsonReport.get(JSON_KEY_REPORT_NAME)!=null)
+	    	            	{
+	    	            		report.setReportName((String) jsonReport.get(JSON_KEY_REPORT_NAME));	
+	    	            	}
+	    	            	if(jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)!=null)
+	    	            	{
+	    	            		String parts[] = ((String) jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
+	    	            		if(parts.length==3)
+	    	            		{
+	    	            			int hours = Integer.parseInt(parts[0]);
+	    	            			int minutes = Integer.parseInt(parts[1]);
+	    	            			int seconds = Integer.parseInt(parts[2]);
+	    	            			report.setScheduledStartTime(new Time(hours,minutes,seconds));
+	    	            		}
+	    	            		else
+	    	            		{
+	    	            			throw new Exception("invalid scheduled start time definition. correct format is: [HH:mm:ss]");
+	    	            		}
+	    	            	}
+	    	            	if(jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL)!=null)
+	    	            	{
+	    	            		report.setCheckInterval((long) jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL));	
+	    	            	}
+	    	            	if(jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS)!=null)
+	    	            	{
+	    	            		report.setMaxCheckIntervals((long) jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS));	
+	    	            	}
+	    	            	if(jsonReport.get(JSON_KEY_REPORT_PARAMETERS)!=null)
+	    	            	{
+	    	            		JSONObject jsonParameters = (JSONObject) jsonReport.get(JSON_KEY_REPORT_PARAMETERS);
+	    	            		
+	    	            		ArrayList<String>parameters = new ArrayList<String>();
+
+	    	                	for(Object key: jsonParameters.keySet())
+	    	                	{
+	    	                		String value = (String) jsonParameters.get(key);
+	    	                		
+	    	                		// translate variables to their real value
+	    	                		if(VariableReplacer.isVariable(value))
+	    	                		{
+	    	                			String variableName = VariableReplacer.getVariableName(value);
+	    	                			int offset = VariableReplacer.getOffset(value);
+	    	                			int realValue = DateTimeUtility.getFieldValue(variableName,offset);
+	    	                		
+	    	                			parameters.add("&" + key + "=" + realValue);
+	    	                		}
+	    	                		else
+	    	                		{
+	    	                			parameters.add("-param:" + key + "=" + value);
+	    	                		}
+	    	                	}
+	    	                	
+	    		            	report.setParameters(parameters);
+	    	            	}
+
+	                		
+	                		
+	                		job.addReport(report);
+	                	}
+	                	
+	                }
 	        		addJob(job);
             	}
             	else
@@ -352,7 +454,7 @@ public class JobManager
 		// load the reports for the specified job
 		
 		Report report = new Report("id_0001", "testReport_1","/home/uwe/development/jobexecutor");
-		report.setScheduledTime(2017,12,10,15,30,00);
+		report.setScheduledStartTime(2017,12,10,15,30,00);
 		report.setDependentJob(job);
 		report.setRequiresJobFinished(true);
 		
