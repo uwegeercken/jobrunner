@@ -19,6 +19,7 @@
 
 package com.datamelt.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -51,14 +52,40 @@ public class DateTimeUtility
 		return calendar.get(field);
 	}
 	
-	public static int getFieldValue(String name, int offset)
+	public static int getFieldValue(String name, int offset) throws Exception
 	{
 		Calendar calendar = Calendar.getInstance();
 		
 		int translatedField = translateVariableName(name);
 		
-		calendar.add(translatedField, offset);
-		return calendar.get(translatedField);
+		if(translatedField!=-1)
+		{
+			calendar.add(translatedField, offset);
+			return calendar.get(translatedField);
+		}
+		else
+		{
+			throw new Exception("unknown field: [" + name + "]");
+		}
+		
+	}
+	
+	public static String getFieldValue(String name, int offset, String dateFormat) throws Exception
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+		Calendar calendar = Calendar.getInstance();
+		
+		int translatedField = translateVariableName(name);
+		
+		if(translatedField!=-1)
+		{
+			calendar.add(translatedField, offset);
+			return sdf.format(calendar.getTime());
+		}
+		else
+		{
+			throw new Exception("unknown field: [" + name + "]");
+		}
 	}
 	
 	public static int translateVariableName(String name)
@@ -72,4 +99,5 @@ public class DateTimeUtility
 			return -1;
 		}
 	}
+	
 }

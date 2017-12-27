@@ -17,11 +17,24 @@
 					"name": "Report 1",
 					"filename": "report_01.prpt",
 					"path": "/home/uwe/development/git/jobrunner/prd",
-					"target_path": "/home/uwe/development/git/jobrunner/pdi/output",
+					"target_path": "/home/uwe/development/git/jobrunner/prd/output",
+					"pentaho_server": "http://prod.pentaho.swissport.aero",
+					"pentaho_server_port": 80,
+					"pentaho_base_url": "pentaho/api/repos/:public",
+					"pentaho_solution": "CH",
+					"pentaho_path": "EPX",
+					"render_mode": "REPORT",
+					"output-target": "pageable-pdf",
+					"locale": "de_DE",
+					"attachment_name": "absenzreport_zrh_bzod",
+					
+					"userid": "xxx",
+					"password": "pwd",
+
 					"scheduled_start_time": "23:16:00",
 					"check_interval": 3000,
 					"max_check_intervals": 5,
-					"parameters": {"unit": "abc","day": "${day:-1}"}
+					"parameters": {"parm_company": "Swissport","parm_date": "${day:-3:yyyy-MM-dd}", "parm_station": "ZRH", "parm_unit": "BZOD"}
 				}
 			]
 		},

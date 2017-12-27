@@ -79,7 +79,7 @@ public class VariableReplacer
 		if(value!=null)
 		{
 			String parts[] = variableValue.split(":");
-			if(parts.length==2)
+			if(parts.length>=2)
 			{
 				try
 				{
@@ -92,5 +92,26 @@ public class VariableReplacer
 			}
 		}
 		return offsetValue;
+	}
+	
+	public static String getDateFormat(String value)
+	{
+		String variableValue = stripVariableMarkings(value);
+		if(value!=null && !value.trim().equals(""))
+		{
+			String parts[] = variableValue.split(":");
+			if(parts.length==3)
+			{
+				return parts[2];
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else
+		{
+			return null;
+		}
 	}
 }

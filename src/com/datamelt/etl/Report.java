@@ -41,8 +41,16 @@ public class Report implements Comparable<Report>
 	private long checkInterval 						= DEFAULT_CHECK_INTERVAL;
 	private long checkIntervalCounter				= 0;
 	private long maxCheckIntervals 					= DEFAULT_MAX_CHECK_INTERVALS;
+	private String pentahoServer;
+	private long pentahoServerPort;
+	private String pentahoBaseUrl;
+	private String pentahoSolution;
+	private String pentahoPath;
+	private String pentahoRenderMode;
+	private String pentahoOutputTarget;
+	private String pentahoLocale;
+	private String pentahoAttachmentName;
 
-	
 	private ArrayList<String> parameters			= new ArrayList<String>();
 	
 	public Report(String id, String name, String path)
@@ -90,6 +98,11 @@ public class Report implements Comparable<Report>
 		this.path = path;
 	}
 
+	public String getServerPath()
+	{
+		return pentahoServer +":" + pentahoServerPort +"/" + pentahoBaseUrl + "/" + pentahoSolution + pentahoPath + "&render_mode=" + pentahoRenderMode + "&output-target=" + pentahoOutputTarget + "&locale=" + pentahoLocale;
+	}
+	
 	public String getTargetPath()
 	{
 		return targetPath;
@@ -140,6 +153,16 @@ public class Report implements Comparable<Report>
 		return checkInterval;
 	}
 	
+	public long getCheckIntervalCounter()
+	{
+		return checkIntervalCounter;
+	}
+
+	public void setCheckIntervalCounter(long checkIntervalCounter)
+	{
+		this.checkIntervalCounter = checkIntervalCounter;
+	}
+
 	public long getCheckIntervalSeconds()
 	{
 		return checkInterval/1000;
@@ -190,6 +213,96 @@ public class Report implements Comparable<Report>
 		this.scheduledStartTime = scheduledStartTime;
 	}
 	
+	public String getPentahoServer()
+	{
+		return pentahoServer;
+	}
+
+	public void setPentahoServer(String pentahoServer)
+	{
+		this.pentahoServer = pentahoServer;
+	}
+
+	public long getPentahoServerPort()
+	{
+		return pentahoServerPort;
+	}
+
+	public void setPentahoServerPort(long pentahoServerPort)
+	{
+		this.pentahoServerPort = pentahoServerPort;
+	}
+
+	public String getPentahoBaseUrl()
+	{
+		return pentahoBaseUrl;
+	}
+
+	public void setPentahoBaseUrl(String pentahoBaseUrl)
+	{
+		this.pentahoBaseUrl = pentahoBaseUrl;
+	}
+
+	public String getPentahoSolution()
+	{
+		return pentahoSolution;
+	}
+
+	public void setPentahoSolution(String pentahoSolution)
+	{
+		this.pentahoSolution = pentahoSolution;
+	}
+
+	public String getPentahoPath()
+	{
+		return pentahoPath;
+	}
+
+	public void setPentahoPath(String pentahoPath)
+	{
+		this.pentahoPath = pentahoPath;
+	}
+
+	public String getPentahoRenderMode()
+	{
+		return pentahoRenderMode;
+	}
+
+	public void setPentahoRenderMode(String pentahoRenderMode)
+	{
+		this.pentahoRenderMode = pentahoRenderMode;
+	}
+
+	public String getPentahoOutputTarget()
+	{
+		return pentahoOutputTarget;
+	}
+
+	public void setPentahoOutputTarget(String pentahoOutputTarget)
+	{
+		this.pentahoOutputTarget = pentahoOutputTarget;
+	}
+
+	public String getPentahoLocale()
+	{
+		return pentahoLocale;
+	}
+
+	public void setPentahoLocale(String pentahoLocale)
+	{
+		this.pentahoLocale = pentahoLocale;
+	}
+
+	public String getPentahoAttachmentName()
+	{
+		return pentahoAttachmentName;
+	}
+
+	public void setPentahoAttachmentName(String pentahoAttachmentName)
+	{
+		this.pentahoAttachmentName = pentahoAttachmentName;
+	}
+
 	@Override
 	public int compareTo(Report arg0)
 	{

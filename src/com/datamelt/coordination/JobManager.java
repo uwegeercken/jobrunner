@@ -43,52 +43,62 @@ import com.datamelt.util.VariableReplacer;
 
 public class JobManager
 {
-	public static final String JSON_KEY_JOB_ID						= "id";
-	public static final String JSON_KEY_JOB_FILENAME				= "filename";
-	public static final String JSON_KEY_JOB_NAME					= "name";
-	public static final String JSON_KEY_JOB_PATH					= "path";
-	public static final String JSON_KEY_JOBS						= "jobs";
-	public static final String JSON_KEY_JOB_RUN_REPORTS				= "run_reports";
-	public static final String JSON_KEY_JOB_SCHEDULED_START_TIME	= "scheduled_start_time";
-	public static final String JSON_KEY_JOB_CHECK_INTERVAL			= "check_interval";
-	public static final String JSON_KEY_JOB_LOG_LEVEL				= "log_level";
-	public static final String JSON_KEY_JOB_MAX_CHECK_INTERVALS		= "max_check_intervals";
-	public static final String JSON_KEY_JOB_DEPENDS_ON_JOB			= "depends_on_job";
-	public static final String JSON_KEY_JOB_DEPENDENT_JOB_ID		= "jobid";
-	public static final String JSON_KEY_JOB_PARAMETERS				= "parameters";
-	public static final String JSON_KEY_JOB_PARAMETER				= "parameter";
+	public static final String JSON_KEY_JOB_ID							= "id";
+	public static final String JSON_KEY_JOB_FILENAME					= "filename";
+	public static final String JSON_KEY_JOB_NAME						= "name";
+	public static final String JSON_KEY_JOB_PATH						= "path";
+	public static final String JSON_KEY_JOBS							= "jobs";
+	public static final String JSON_KEY_JOB_RUN_REPORTS					= "run_reports";
+	public static final String JSON_KEY_JOB_SCHEDULED_START_TIME		= "scheduled_start_time";
+	public static final String JSON_KEY_JOB_CHECK_INTERVAL				= "check_interval";
+	public static final String JSON_KEY_JOB_LOG_LEVEL					= "log_level";
+	public static final String JSON_KEY_JOB_MAX_CHECK_INTERVALS			= "max_check_intervals";
+	public static final String JSON_KEY_JOB_DEPENDS_ON_JOB				= "depends_on_job";
+	public static final String JSON_KEY_JOB_DEPENDENT_JOB_ID			= "jobid";
+	public static final String JSON_KEY_JOB_PARAMETERS					= "parameters";
+	public static final String JSON_KEY_JOB_PARAMETER					= "parameter";
 	
-	public static final String JSON_KEY_REPORTS						= "reports";
-	public static final String JSON_KEY_REPORT_ID					= "id";
-	public static final String JSON_KEY_REPORT_FILENAME				= "filename";
-	public static final String JSON_KEY_REPORT_NAME					= "name";
-	public static final String JSON_KEY_REPORT_PATH					= "path";
-	public static final String JSON_KEY_REPORT_TARGET_PATH			= "target_path";
-	public static final String JSON_KEY_REPORT_SCHEDULED_START_TIME	= "scheduled_start_time";
-	public static final String JSON_KEY_REPORT_CHECK_INTERVAL		= "check_interval";
-	public static final String JSON_KEY_REPORT_MAX_CHECK_INTERVALS	= "max_check_intervals";
-	public static final String JSON_KEY_REPORT_PARAMETERS			= "parameters";
-	public static final String JSON_KEY_REPORT_PARAMETER			= "parameter";
+	public static final String JSON_KEY_REPORTS							= "reports";
+	public static final String JSON_KEY_REPORT_ID						= "id";
+	public static final String JSON_KEY_REPORT_FILENAME					= "filename";
+	public static final String JSON_KEY_REPORT_NAME						= "name";
+	public static final String JSON_KEY_REPORT_PATH						= "path";
+	public static final String JSON_KEY_REPORT_TARGET_PATH				= "target_path";
+	public static final String JSON_KEY_REPORT_SCHEDULED_START_TIME		= "scheduled_start_time";
+	public static final String JSON_KEY_REPORT_CHECK_INTERVAL			= "check_interval";
+	public static final String JSON_KEY_REPORT_MAX_CHECK_INTERVALS		= "max_check_intervals";
+	public static final String JSON_KEY_REPORT_PARAMETERS				= "parameters";
+	public static final String JSON_KEY_REPORT_PARAMETER				= "parameter";
 	
-	private static final String DEFAULT_DATETIME_FORMAT				= "yyyy-MM-dd HH:mm:ss";
-    private static SimpleDateFormat sdf								= new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
+	public static final String JSON_KEY_REPORT_PENTAHO_SERVER			= "pentaho_server";
+	public static final String JSON_KEY_REPORT_PENTAHO_SERVER_PORT		= "pentaho_server_port";
+	public static final String JSON_KEY_REPORT_PENTAHO_BASE_URL			= "pentaho_base_url";
+	public static final String JSON_KEY_REPORT_PENTAHO_SOLUTION			= "pentaho_solution";
+	public static final String JSON_KEY_REPORT_PENTAHO_PATH				= "pentaho_path";
+	public static final String JSON_KEY_REPORT_PENTAHO_RENDER_MODE		= "render_mode";
+	public static final String JSON_KEY_REPORT_PENTAHO_OUTPUT_TARGET	= "output-target";
+	public static final String JSON_KEY_REPORT_PENTAHO_LOCALE		= "locale";
+	public static final String JSON_KEY_REPORT_PENTAHO_ATTACHMENT_NAME	= "attachment_name";
 	
-	public static final int STATUS_UNDEFINED	 					= 0;
-	public static final int STATUS_JOB_CAN_START 					= 1;
-	public static final int STATUS_SCHEDULED_TIME_NOT_REACHED 		= 2;
-	public static final int STATUS_DEPENDENT_JOB_NOT_FINISHED 		= 3;
-	public static final int STATUS_DEPENDENT_JOB_BAD_EXIT_CODE 		= 4;
+	private static final String DEFAULT_DATETIME_FORMAT					= "yyyy-MM-dd HH:mm:ss";
+    private static SimpleDateFormat sdf									= new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
 	
-	public static final String[] JOB_STATUS 						= {"undefined","can start","scheduled time not reached","dependent job(s) not finished", "dependent job(s) with bad exit code"};
+	public static final int STATUS_UNDEFINED	 						= 0;
+	public static final int STATUS_JOB_CAN_START 						= 1;
+	public static final int STATUS_SCHEDULED_TIME_NOT_REACHED 			= 2;
+	public static final int STATUS_DEPENDENT_JOB_NOT_FINISHED 			= 3;
+	public static final int STATUS_DEPENDENT_JOB_BAD_EXIT_CODE 			= 4;
 	
-	public static final String TIME_DELIMITER						= ":";
+	public static final String[] JOB_STATUS 							= {"undefined","can start","scheduled time not reached","dependent job(s) not finished", "dependent job(s) with bad exit code"};
 	
-	private JobCollection jobs 										= new JobCollection();
-	private ReportCollection reports 								= new ReportCollection();
-	private String jobFilename										= null;
-	private String folderLogfiles									= null;
+	public static final String TIME_DELIMITER							= ":";
 	
-	private HashMap<String,String> jsonJobs							= new HashMap<String,String>();
+	private JobCollection jobs 											= new JobCollection();
+	private ReportCollection reports 									= new ReportCollection();
+	private String jobFilename											= null;
+	private String folderLogfiles										= null;
+	
+	private HashMap<String,String> jsonJobs								= new HashMap<String,String>();
 	
 	public JobManager(String filename) throws Exception
 	{
@@ -397,18 +407,61 @@ public class JobManager
             	}
             	if(jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)!=null)
             	{
-            		String parts[] = ((String) jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
+        			String parts[] = ((String) jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
             		if(parts.length==3)
             		{
-            			int hours = Integer.parseInt(parts[0]);
-            			int minutes = Integer.parseInt(parts[1]);
-            			int seconds = Integer.parseInt(parts[2]);
-            			report.setScheduledStartTime(new Time(hours,minutes,seconds));
+                		try
+                		{
+                			int hours = Integer.parseInt(parts[0]);
+                			int minutes = Integer.parseInt(parts[1]);
+                			int seconds = Integer.parseInt(parts[2]);
+                			report.setScheduledStartTime(new Time(hours,minutes,seconds));
+                		}
+                		catch(Exception ex)
+                		{
+                			ex.printStackTrace();
+                		}
             		}
             		else
             		{
-            			throw new Exception("invalid scheduled start time definition. correct format is: [HH:mm:ss]");
+            			throw new Exception("invalid scheduled start time. correct format is: [HH:mm:ss]");
             		}
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER)!=null)
+            	{
+            		report.setPentahoServer((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER_PORT)!=null)
+            	{
+            		report.setPentahoServerPort((long) jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER_PORT));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_BASE_URL)!=null)
+            	{
+            		report.setPentahoBaseUrl((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_BASE_URL));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_SOLUTION)!=null)
+            	{
+            		report.setPentahoSolution((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_SOLUTION));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_PATH)!=null)
+            	{
+            		report.setPentahoPath((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_PATH));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_RENDER_MODE)!=null)
+            	{
+            		report.setPentahoRenderMode((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_RENDER_MODE));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_OUTPUT_TARGET)!=null)
+            	{
+            		report.setPentahoOutputTarget((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_OUTPUT_TARGET));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_LOCALE)!=null)
+            	{
+            		report.setPentahoLocale((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_LOCALE));	
+            	}
+            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_ATTACHMENT_NAME)!=null)
+            	{
+            		report.setPentahoAttachmentName((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_ATTACHMENT_NAME));	
             	}
             	if(jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL)!=null)
             	{
@@ -425,7 +478,7 @@ public class JobManager
             	if(jsonReport.get(JSON_KEY_REPORT_PARAMETERS)!=null)
             	{
             		JSONObject jsonParameters = (JSONObject) jsonReport.get(JSON_KEY_REPORT_PARAMETERS);
-            		
+
             		ArrayList<String>parameters = new ArrayList<String>();
 
                 	for(Object key: jsonParameters.keySet())
@@ -437,13 +490,22 @@ public class JobManager
                 		{
                 			String variableName = VariableReplacer.getVariableName(value);
                 			int offset = VariableReplacer.getOffset(value);
-                			int realValue = DateTimeUtility.getFieldValue(variableName,offset);
-                		
-                			parameters.add("&" + key + "=" + realValue);
+                			String dateFormat = VariableReplacer.getDateFormat(value);
+                			if(dateFormat==null)
+                			{
+                				int realValue = DateTimeUtility.getFieldValue(variableName,offset);
+                				parameters.add("&" + key + "=" + realValue);	
+                			}
+                			else
+                			{
+                				String realValue = DateTimeUtility.getFieldValue(variableName,offset,dateFormat);
+                				parameters.add("&" + key + "=" + realValue);
+                			}
+                			
                 		}
                 		else
                 		{
-                			parameters.add("-param:" + key + "=" + value);
+                			parameters.add("&" + key + "=" + value);
                 		}
                 	}
 	            	report.setParameters(parameters);
@@ -561,6 +623,7 @@ public class JobManager
 					else
 					{
 						status = STATUS_JOB_CAN_START;
+						
 					}
 				}
 			}
