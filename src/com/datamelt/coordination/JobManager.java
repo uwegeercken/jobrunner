@@ -60,6 +60,7 @@ public class JobManager
 	
 	public static final String JSON_KEY_REPORTS							= "reports";
 	public static final String JSON_KEY_REPORT_ID						= "id";
+	public static final String JSON_KEY_REPORT_GROUP					= "group";
 	public static final String JSON_KEY_REPORT_FILENAME					= "filename";
 	public static final String JSON_KEY_REPORT_NAME						= "name";
 	public static final String JSON_KEY_REPORT_PATH						= "path";
@@ -467,6 +468,10 @@ public class JobManager
             	{
             		report.setCheckInterval((long) jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL));	
             	}
+            	if(jsonReport.get(JSON_KEY_REPORT_GROUP)!=null)
+            	{
+            		report.setGroup((long) jsonReport.get(JSON_KEY_REPORT_GROUP));	
+            	}
             	if(jsonReport.get(JSON_KEY_REPORT_TARGET_PATH)!=null)
             	{
             		report.setTargetPath((String) jsonReport.get(JSON_KEY_REPORT_TARGET_PATH));	
@@ -648,6 +653,19 @@ public class JobManager
 	public int getNumberOfJobs()
 	{
 		return jobs.size();
+	}
+	
+	public ArrayList<Report> getGroupReports(long group)
+	{
+		ArrayList<Report> groupReports = new ArrayList<Report>();
+		for(Report report : reports.getReports())
+		{
+			if(report.getGroup() == group)
+			{
+				groupReports.add(report);
+			}
+		}
+		return groupReports;
 	}
 	
 	public ArrayList<String> getNextJobs()

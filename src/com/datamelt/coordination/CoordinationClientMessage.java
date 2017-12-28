@@ -57,7 +57,7 @@ public class CoordinationClientMessage
 			    	System.out.println(response.toString());
 			    	
 			    	// send an exit signal
-			    	client.getServerMessage(ClientHandler.RESPONSE_EXIT);
+			    	client.getServerMessage(ClientHandler.MESSAGE_EXIT);
 			    	
 					// cleanup
 			    	client.closeOutputStream();

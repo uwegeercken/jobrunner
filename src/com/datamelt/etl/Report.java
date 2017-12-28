@@ -33,6 +33,7 @@ public class Report implements Comparable<Report>
 	private String reportName;
 	private String path;
 	private String targetPath;
+	private long group;
 	private Time scheduledStartTime;
 	private Time actualStartTime;
 	private Time finishedTime;
@@ -301,6 +302,17 @@ public class Report implements Comparable<Report>
 	public void setPentahoAttachmentName(String pentahoAttachmentName)
 	{
 		this.pentahoAttachmentName = pentahoAttachmentName;
+	}
+
+	
+	public long getGroup()
+	{
+		return group;
+	}
+
+	public void setGroup(long group)
+	{
+		this.group = group;
 	}
 
 	@Override

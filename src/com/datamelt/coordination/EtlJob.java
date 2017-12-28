@@ -95,7 +95,7 @@ public class EtlJob extends Thread
 			
 			while(jobStatus!=JobManager.STATUS_JOB_CAN_START)
 			{
-				jobStatus = (int)client.getServerMessage(ClientHandler.RESPONSE_JOB_START_STATUS + ClientHandler.DELIMITER + job.getJobId());
+				jobStatus = (int)client.getServerMessage(ClientHandler.MESSAGE_JOB_START_STATUS + ClientHandler.DELIMITER + job.getJobId());
 				if(jobStatus==JobManager.STATUS_SCHEDULED_TIME_NOT_REACHED)
 				{
 					//System.out.println(sdf.format(new Date()) + " - [" + job.getJobId()+ "] job scheduled start time not reached: " + job.getScheduledStartTime().getTime());
@@ -134,7 +134,7 @@ public class EtlJob extends Thread
 				System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId() + "] started [" + job.getActualStartTime().getTime() + "]");
 				
 				// send an exit signal
-		    	client.getServerMessage(ClientHandler.RESPONSE_EXIT);
+		    	client.getServerMessage(ClientHandler.MESSAGE_EXIT);
 		    	
 				process = processBuilder.start();
 			    int exitCode = process.waitFor();
@@ -144,7 +144,10 @@ public class EtlJob extends Thread
 			    job.setFinishedTime(new Time(Calendar.getInstance()));
 			    
 				System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId() + "] finished [" + job.getFinishedTime().getTime() + "]");
-				System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] exit code: " + exitCode);
+				if(exitCode!=0)
+				{
+					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] exit code: " + exitCode);
+				}
 				
 		    	
 			}

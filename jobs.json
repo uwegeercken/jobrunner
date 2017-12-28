@@ -1,7 +1,7 @@
 {
 	"jobs":	[
 		{
-			"id": "id_0001",
+			"id": "etl_0001",
 			"name": "ETL Job 1",
 			"filename": "job_test_01.kjb",
 			"path": "/home/uwe/development/git/jobrunner/pdi",
@@ -16,6 +16,7 @@
 					"id": "rp_0001",
 					"name": "Report 1",
 					"filename": "report_01.prpt",
+					"group": 1,
 					"path": "/home/uwe/development/git/jobrunner/prd",
 					"target_path": "/home/uwe/development/git/jobrunner/prd/output",
 					"pentaho_server": "http://prod.pentaho.swissport.aero",
@@ -34,12 +35,12 @@
 					"scheduled_start_time": "23:16:00",
 					"check_interval": 3000,
 					"max_check_intervals": 5,
-					"parameters": {"parm_company": "Swissport","parm_date": "${day:-3:yyyy-MM-dd}", "parm_station": "ZRH", "parm_unit": "BZOD"}
+					"parameters": {"parm_company": "Swissport","parm_date": "${day:-3:yyyy-MM-01}", "parm_station": "ZRH", "parm_unit": "BZOD"}
 				}
 			]
 		},
 		{
-			"id": "id_0002",
+			"id": "etl_0002",
 			"name": "ETL Job  2",
 			"filename": "job_test_02.kjb",
 			"path": "/home/uwe/development/git/jobrunner/pdi",
@@ -47,7 +48,7 @@
 			"check_interval": 3000,
 			"max_check_intervals": 5,
 			"depends_on_job": [
-				{"jobid": "id_0001"}
+				{"jobid": "etl_0001"}
 			],
 			"parameters": {"jobnumber": "2"},
 			"log_level": "Basic",
@@ -57,7 +58,7 @@
 			]
 		},
 		{
-			"id": "id_0003",
+			"id": "etl_0003",
 			"name": "ETL Job 3",
 			"filename": "job_test_03.kjb",
 			"path": "/home/uwe/development/git/jobrunner/pdi",
@@ -65,8 +66,8 @@
 			"check_interval": 10000,
 			"max_check_intervals": 5,
 			"depends_on_job": [
-				{"jobid": "id_0002"},
-				{"jobid":"id_0001"}
+				{"jobid": "etl_0002"},
+				{"jobid":"etl_0001"}
 			],
 			"parameters": {"jobnumber": "2"},
 			"log_level": "Basic",

@@ -50,26 +50,26 @@ public class ClientHandler extends Thread
     // the "exit" message is explicitly excluded here
     public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "jobreset", "jobremove", "jobjson", "listjobs", "resetjobs", "reloadjobs", "numberofjobs", "nextjob"};
     
-    public static final String RESPONSE_UPTIME 				= "uptime";
-    public static final String RESPONSE_EXIT 				= "exit";
-    public static final String RESPONSE_PROCESSID 			= "processid";
-    public static final String RESPONSE_HELLO				= "hello";
-    public static final String RESPONSE_JOB_FINISHED		= "jobfinished";
-    public static final String RESPONSE_JOB_CAN_START		= "jobcanstart";
-    public static final String RESPONSE_JOB_START_STATUS	= "jobstartstatus";
-    public static final String RESPONSE_JOB_STARTTIME		= "jobstarttime";
-    public static final String RESPONSE_JOB_RUNTIME			= "jobruntime";
-    public static final String RESPONSE_JOB_RESET			= "jobreset";
-    public static final String RESPONSE_JOB_REMOVE			= "jobremove";
-    public static final String RESPONSE_JOB_JSON			= "jobjson";
-    public static final String RESPONSE_RESET_JOBS			= "resetjobs";
-    public static final String RESPONSE_RELOAD_JOBS			= "reloadjobs";
-    public static final String RESPONSE_NUMBER_OF_JOBS		= "numberofjobs";
-    public static final String RESPONSE_LIST_JOBS			= "listjobs";
-    public static final String RESPONSE_NEXT_JOB			= "nextjob";
-    public static final String RESPONSE_JOB_RUN				= "jobrun";
-    public static final String RESPONSE_JOB_EXIT_CODE		= "jobexitcode";
-    public static final String RESPONSE_JOB_DEPENDENCIES	= "jobdependencies";
+    public static final String MESSAGE_UPTIME 				= "uptime";
+    public static final String MESSAGE_EXIT 				= "exit";
+    public static final String MESSAGE_PROCESSID 			= "processid";
+    public static final String MESSAGE_HELLO				= "hello";
+    public static final String MESSAGE_JOB_FINISHED			= "jobfinished";
+    public static final String MESSAGE_JOB_CAN_START		= "jobcanstart";
+    public static final String MESSAGE_JOB_START_STATUS		= "jobstartstatus";
+    public static final String MESSAGE_JOB_STARTTIME		= "jobstarttime";
+    public static final String MESSAGE_JOB_RUNTIME			= "jobruntime";
+    public static final String MESSAGE_JOB_RESET			= "jobreset";
+    public static final String MESSAGE_JOB_REMOVE			= "jobremove";
+    public static final String MESSAGE_JOB_JSON				= "jobjson";
+    public static final String MESSAGE_RESET_JOBS			= "resetjobs";
+    public static final String MESSAGE_RELOAD_JOBS			= "reloadjobs";
+    public static final String MESSAGE_NUMBER_OF_JOBS		= "numberofjobs";
+    public static final String MESSAGE_LIST_JOBS			= "listjobs";
+    public static final String MESSAGE_NEXT_JOB				= "nextjob";
+    public static final String MESSAGE_JOB_RUN				= "jobrun";
+    public static final String MESSAGE_JOB_EXIT_CODE		= "jobexitcode";
+    public static final String MESSAGE_JOB_DEPENDENCIES		= "jobdependencies";
     
     public static final String DELIMITER					= ":";
     
@@ -108,7 +108,7 @@ public class ClientHandler extends Thread
             	if(object instanceof String)
             	{
             		String serverObject = (String)object;
-            		if(serverObject.equals(RESPONSE_EXIT))
+            		if(serverObject.equals(MESSAGE_EXIT))
             		{
     	                String responseMessage = "exit";
     	                sendClientMessage(responseMessage);
@@ -117,21 +117,21 @@ public class ClientHandler extends Thread
 
     	               	ok=false;
             		}
-            		else if(serverObject.equals(RESPONSE_UPTIME))
+            		else if(serverObject.equals(MESSAGE_UPTIME))
             		{
     	                String responseMessage = "uptime " + getRunTime(System.currentTimeMillis(),serverStart);
     	                sendClientMessage(responseMessage);
             		}
-            		else if(serverObject.equals(RESPONSE_PROCESSID))
+            		else if(serverObject.equals(MESSAGE_PROCESSID))
             		{
     	                long pid = getProcessId();
     	                sendClientMessage("server processid: [" + pid + "]");
             		}
-            		else if(serverObject.equals(RESPONSE_HELLO))
+            		else if(serverObject.equals(MESSAGE_HELLO))
             		{
-    	                sendClientMessage(RESPONSE_HELLO + " client from: [" + socket.getInetAddress().toString() + "]");
+    	                sendClientMessage(MESSAGE_HELLO + " client from: [" + socket.getInetAddress().toString() + "]");
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_CAN_START))
+            		else if(serverObject.startsWith(MESSAGE_JOB_CAN_START))
             		{
             			String jobId = parseJobId(serverObject);
             			int jobStatus = jobManager.getJobStatus(jobId);
@@ -144,7 +144,7 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_START_STATUS))
+            		else if(serverObject.startsWith(MESSAGE_JOB_START_STATUS))
             		{
             			String jobId = parseJobId(serverObject);
             			int jobStatus = jobManager.getJobStatus(jobId);
@@ -157,7 +157,7 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_STARTTIME))
+            		else if(serverObject.startsWith(MESSAGE_JOB_STARTTIME))
             		{
             			String jobId = parseJobId(serverObject);
             			String jobStarttime = jobManager.getJobScheduledStarttime(jobId);
@@ -170,7 +170,7 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_JSON))
+            		else if(serverObject.startsWith(MESSAGE_JOB_JSON))
             		{
             			String jobId = parseJobId(serverObject);
         				Job job = jobManager.getJob(jobId);
@@ -183,7 +183,7 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_RUNTIME))
+            		else if(serverObject.startsWith(MESSAGE_JOB_RUNTIME))
             		{
             			String jobId = parseJobId(serverObject);
         				Job job = jobManager.getJob(jobId);
@@ -209,7 +209,7 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_DEPENDENCIES))
+            		else if(serverObject.startsWith(MESSAGE_JOB_DEPENDENCIES))
             		{
             			String jobId = parseJobId(serverObject);
         				Job job = jobManager.getJob(jobId);
@@ -222,7 +222,7 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
-            		else if(serverObject.startsWith(RESPONSE_NEXT_JOB))
+            		else if(serverObject.startsWith(MESSAGE_NEXT_JOB))
             		{
             				ArrayList<String> nextJobIds = jobManager.getNextJobs();
             				if(nextJobIds.size()>0)
@@ -236,28 +236,28 @@ public class ClientHandler extends Thread
             					sendClientMessage("no next job");
             				}
             		}
-            		else if(serverObject.startsWith(RESPONSE_LIST_JOBS))
+            		else if(serverObject.startsWith(MESSAGE_LIST_JOBS))
             		{
         					sendClientMessage("list of jobs: " + Arrays.deepToString(jobManager.getJobList()));
             		}
-            		else if(serverObject.startsWith(RESPONSE_NUMBER_OF_JOBS))
+            		else if(serverObject.startsWith(MESSAGE_NUMBER_OF_JOBS))
             		{
         					sendClientMessage("number of jobs: [" + jobManager.getNumberOfJobs() + "]");
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_EXIT_CODE))
+            		else if(serverObject.startsWith(MESSAGE_JOB_EXIT_CODE))
             		{
             			String jobId = parseJobId(serverObject);
             			int exitCode = jobManager.getJob(jobId).getExitCode();
            				sendClientMessage(jobId, exitCode);
             		}
-            		else if(serverObject.startsWith(RESPONSE_RESET_JOBS))
+            		else if(serverObject.startsWith(MESSAGE_RESET_JOBS))
             		{
             			jobManager.resetJobs();
             			
             			systemMessage("reset jobs. schedules set to current date");
     	                sendClientMessage("ok");
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_RESET))
+            		else if(serverObject.startsWith(MESSAGE_JOB_RESET))
             		{
             			String jobId = parseJobId(serverObject);
             			Job job = jobManager.getJob(jobId);
@@ -271,7 +271,7 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_REMOVE))
+            		else if(serverObject.startsWith(MESSAGE_JOB_REMOVE))
             		{
             			String jobId = parseJobId(serverObject);
             			Job job = jobManager.getJob(jobId);
@@ -285,14 +285,14 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
-            		else if(serverObject.startsWith(RESPONSE_RELOAD_JOBS))
+            		else if(serverObject.startsWith(MESSAGE_RELOAD_JOBS))
             		{
             			jobManager.reloadJobs();
             			
             			systemMessage("reloaded jobs");
     	                sendClientMessage("ok");
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_FINISHED))
+            		else if(serverObject.startsWith(MESSAGE_JOB_FINISHED))
             		{
             			String jobId = parseJobId(serverObject);
             			Job job = jobManager.getJob(jobId);
@@ -312,7 +312,7 @@ public class ClientHandler extends Thread
             				sendClientMessage(jobId, "not existing");
             			}
             		}
-            		else if(serverObject.startsWith(RESPONSE_JOB_RUN))
+            		else if(serverObject.startsWith(MESSAGE_JOB_RUN))
             		{
             			String jobId = parseJobId(serverObject);
             			Job job = jobManager.getJob(jobId);
