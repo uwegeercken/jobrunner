@@ -19,6 +19,7 @@
 
 package com.datamelt.util;
 
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -32,6 +33,9 @@ public class DateTimeUtility
 	public static final String	VARIABLE_MINUTE				= "minute";
 	public static final String	VARIABLE_WEEK				= "week";
 	
+	public static final String	SPECIAL_VARIABLE_PREVIOUS_WEEK_MONDAY		= "previousWeekMonday";
+	public static final String	SPECIAL_VARIABLE_PREVIOUS_WEEK_SUNDAY		= "previousWeekSunday";
+	
 	private static HashMap<String,Integer> map = new HashMap<String,Integer>();
 	
 	static
@@ -42,6 +46,7 @@ public class DateTimeUtility
 		map.put(VARIABLE_HOUR, Calendar.HOUR_OF_DAY);
 		map.put(VARIABLE_MINUTE, Calendar.MINUTE);
 		map.put(VARIABLE_WEEK, Calendar.WEEK_OF_YEAR);
+		
 	}
 	
 	public static int getFieldValue(int field, int value)
@@ -88,7 +93,12 @@ public class DateTimeUtility
 		}
 	}
 	
-	public static int translateVariableName(String name)
+	public static String getSpecialDateValue(String name, int offset, String dateFormat) throws Exception
+	{
+		return (String)getDateMethodResult(name, offset, dateFormat);
+	}
+
+	private static int translateVariableName(String name)
 	{
 		if(map.containsKey(name))
 		{
@@ -98,6 +108,24 @@ public class DateTimeUtility
 		{
 			return -1;
 		}
+	}
+	
+	private static Object getDateMethodResult(String methodName, Integer offset, String dateFormat) throws Exception
+	{
+		Class parameter[] = {Integer.class, String.class};
+		Object[] objects = {offset, dateFormat};
+		String firstLetterUppercase = methodName.substring(0,1).toUpperCase();
+		String fullMethodName = "get" + firstLetterUppercase + methodName.substring(1);
+		
+		Method m = SpecialDatesUtility.class.getMethod(fullMethodName, parameter);
+		return m.invoke(null, objects);
+	}
+	
+	public static void main(String[]args)throws Exception
+	{
+		
+		
+		System.out.println(getDateMethodResult("weekSunday",new Integer(-1),"yyyy-MM-dd"));
 	}
 	
 }

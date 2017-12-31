@@ -38,6 +38,7 @@ import com.datamelt.etl.Report;
 import com.datamelt.etl.ReportCollection;
 import com.datamelt.util.DateTimeUtility;
 import com.datamelt.util.FileUtility;
+import com.datamelt.util.SpecialDatesUtility;
 import com.datamelt.util.Time;
 import com.datamelt.util.VariableReplacer;
 
@@ -489,29 +490,9 @@ public class JobManager
                 	for(Object key: jsonParameters.keySet())
                 	{
                 		String value = (String) jsonParameters.get(key);
+                		String keyValue = getParameterKeyValue((String)key, value);
                 		
-                		// translate variables to their real value
-                		if(VariableReplacer.isVariable(value))
-                		{
-                			String variableName = VariableReplacer.getVariableName(value);
-                			int offset = VariableReplacer.getOffset(value);
-                			String dateFormat = VariableReplacer.getDateFormat(value);
-                			if(dateFormat==null)
-                			{
-                				int realValue = DateTimeUtility.getFieldValue(variableName,offset);
-                				parameters.add("&" + key + "=" + realValue);	
-                			}
-                			else
-                			{
-                				String realValue = DateTimeUtility.getFieldValue(variableName,offset,dateFormat);
-                				parameters.add("&" + key + "=" + realValue);
-                			}
-                			
-                		}
-                		else
-                		{
-                			parameters.add("&" + key + "=" + value);
-                		}
+                		parameters.add("&" + keyValue);
                 	}
 	            	report.setParameters(parameters);
             	}
@@ -534,7 +515,56 @@ public class JobManager
         	}
         }
 	}
-	
+
+	private String getParameterKeyValue(String key, String value) throws Exception
+	{
+		// translate variables to their real value
+		if(VariableReplacer.isVariable(value))
+		{
+			int numberOfParts = 0;
+			
+			numberOfParts = value.split(":").length;
+			String variableName = VariableReplacer.getVariableName(value);
+			int offset = 0;
+			if(numberOfParts==1)
+			{
+				int realValue = DateTimeUtility.getFieldValue(variableName,offset);
+				return key + "=" + realValue;	
+			}
+			else if(numberOfParts==2)
+			{
+				offset = VariableReplacer.getOffset(value);
+				int realValue = DateTimeUtility.getFieldValue(variableName,offset);
+				return key + "=" + realValue;	
+			}
+			else if(numberOfParts==3)
+			{
+				if(SpecialDatesUtility.containsMethod(variableName))
+				{
+					offset = VariableReplacer.getOffset(value);
+					String dateFormat = VariableReplacer.getDateFormat(value);
+					String realValue = DateTimeUtility.getSpecialDateValue(variableName,offset,dateFormat);
+					return key + "=" + realValue;	
+				}
+				else
+				{
+					offset = VariableReplacer.getOffset(value);
+					String dateFormat = VariableReplacer.getDateFormat(value);
+					String realValue = DateTimeUtility.getFieldValue(variableName,offset,dateFormat);
+					return key + "=" + realValue;
+				}
+			}
+			else
+			{
+				return key + "=" + value;
+			}
+			
+		}
+		else
+		{
+			return key + "=" + value;
+		}
+	}
 	private boolean getJobScheduledTimeReached(Job job)
 	{
 		Time now = new Time(Calendar.getInstance());

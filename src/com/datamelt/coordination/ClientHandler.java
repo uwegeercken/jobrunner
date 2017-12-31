@@ -71,6 +71,14 @@ public class ClientHandler extends Thread
     public static final String MESSAGE_JOB_EXIT_CODE		= "jobexitcode";
     public static final String MESSAGE_JOB_DEPENDENCIES		= "jobdependencies";
     
+    public static final String MESSAGE_REPORT_RUN			= "reportrun";
+    public static final String MESSAGE_REPORT_GROUP_RUN		= "reportgrouprun";
+    public static final String MESSAGE_REPORT_STARTTIME		= "reportstarttime";
+    public static final String MESSAGE_REPORT_RUNTIME		= "reportruntime";
+    public static final String MESSAGE_REPORT_RESET			= "reportreset";
+    public static final String MESSAGE_REPORT_REMOVE		= "reportremove";
+    public static final String MESSAGE_REPORT_JSON			= "reportjson";
+    
     public static final String DELIMITER					= ":";
     
     private static final String DEFAULT_DATETIME_FORMAT		= "yyyy-MM-dd HH:mm:ss";
