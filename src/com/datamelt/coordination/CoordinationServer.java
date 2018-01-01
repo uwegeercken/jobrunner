@@ -47,6 +47,7 @@ public class CoordinationServer extends Thread
     private static final String PROPERTIES_FILE 			= "server.properties";
     
     private static final String PROPERTY_FOLDER_LOGS		= "folder.logs";
+    private static final String PROPERTY_JSONFILES_FOLDER	= "folder.jsonfiles";
     private static final String PROPERTY_JOBS_FILENAME		= "jobs.filename";
     private static final String PROPERTY_PORT 				= "server.port";
     private static final String PROPERTY_SCRIPT_FOLDER		= "script.folder";
@@ -156,17 +157,17 @@ public class CoordinationServer extends Thread
     	server.serverStart = System.currentTimeMillis();
     	System.out.println(sdf.format(new Date()) + " - server start...");
 		System.out.println(sdf.format(new Date()) + " - using properties from: [" + server.propertiesFileFullname + "]");
-		File jsonFile = new File(server.getProperty(PROPERTY_JOBS_FILENAME));
+		File jsonFile = new File(server.getProperty(PROPERTY_JSONFILES_FOLDER) + "/" + server.getProperty(PROPERTY_JOBS_FILENAME));
 		if(jsonFile.exists())
 		{
-			server.jobManager = new JobManager(server.getProperty(PROPERTY_JOBS_FILENAME));
+			server.jobManager = new JobManager(server.getProperty(PROPERTY_JSONFILES_FOLDER),server.getProperty(PROPERTY_JOBS_FILENAME));
 			server.jobManager.setFolderLogfiles(server.getProperty(PROPERTY_FOLDER_LOGS));
 			server.start();
 	        System.out.println(sdf.format(new Date()) +  " - waiting on: [" + server.serverSocket.getInetAddress() + "], port: [" + server.port + "] for connections");
 		}
 		else
 		{
-			throw new Exception("error: can not load json file with job definitions: [" + server.getProperty(PROPERTY_JOBS_FILENAME) + "]");
+			throw new Exception("error: can not load json file with job definitions: [" + server.getProperty(PROPERTY_JSONFILES_FOLDER) + "/" + server.getProperty(PROPERTY_JOBS_FILENAME) + "]");
 		}
     }
     

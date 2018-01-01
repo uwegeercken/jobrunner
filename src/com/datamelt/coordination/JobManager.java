@@ -97,14 +97,16 @@ public class JobManager
 	
 	private JobCollection jobs 											= new JobCollection();
 	private ReportCollection reports 									= new ReportCollection();
+	private String jsonFilesFolder										= null;
 	private String jobFilename											= null;
 	private String folderLogfiles										= null;
 	
 	private HashMap<String,String> jsonJobs								= new HashMap<String,String>();
 	
-	public JobManager(String filename) throws Exception
+	public JobManager(String folder, String filename) throws Exception
 	{
 		this.jobFilename = filename;
+		this.jsonFilesFolder = folder;
 		loadJobs();
 	}
 
@@ -242,9 +244,7 @@ public class JobManager
 		
 		try
 		{
-			Object object = parser.parse(new FileReader(jobFilename));
-			
-			JSONObject jsonObject = (JSONObject) object;
+			JSONObject jsonObject  = (JSONObject) parser.parse(new FileReader(jsonFilesFolder +"/" + jobFilename));
 			
 			JSONArray jobs = (JSONArray) jsonObject.get(JSON_KEY_JOBS);
             Iterator<JSONObject> iterator = jobs.iterator();
@@ -382,9 +382,13 @@ public class JobManager
         
         while (reportsIterator.hasNext()) 
         {
-        	JSONObject jsonReport = reportsIterator.next();
+        	JSONObject jsonReportIds = reportsIterator.next();
         	
-        	String reportId = (String) jsonReport.get(JSON_KEY_REPORT_ID);
+        	String reportId = (String) jsonReportIds.get(JSON_KEY_REPORT_ID);
+        
+        	JSONParser parser = new JSONParser();
+        	JSONObject jsonReport = (JSONObject) parser.parse(new FileReader(jsonFilesFolder +"/" + reportId + ".json"));
+        	
         	String reportFilename = (String) jsonReport.get(JSON_KEY_REPORT_FILENAME);
         	String reportPath = (String) jsonReport.get(JSON_KEY_REPORT_PATH);
 

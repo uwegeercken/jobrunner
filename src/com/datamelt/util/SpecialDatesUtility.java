@@ -31,7 +31,9 @@ public class SpecialDatesUtility
 	public static final String METHOD_MONTH_LAST_DAY		= "monthLastDay";
 	public static final String METHOD_MONTH_FIRST_DAY		= "monthFirstDay";
 	
-	public static ArrayList<String> methods = new ArrayList<String>();
+	private static int firstDayOfWeek						= Calendar.MONDAY;
+	
+	private static ArrayList<String> methods = new ArrayList<String>();
 	
 	static 
 	{
@@ -47,12 +49,22 @@ public class SpecialDatesUtility
 		return methods.contains(method);
 	}
 	
+	public static void setFirstDayOfWeek(int firstDay)
+	{
+		firstDayOfWeek = firstDay;
+	}
+	
+	public static int getFirstDayOfWeek()
+	{
+		return firstDayOfWeek;
+	}
+	
 	public static String getWeekMonday(Integer offset, String dateFormat)
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
 		
 		Calendar calendar = Calendar.getInstance();
-		calendar.setFirstDayOfWeek(Calendar.MONDAY);
+		calendar.setFirstDayOfWeek(firstDayOfWeek);
 		calendar.set(Calendar.WEEK_OF_YEAR,calendar.get(Calendar.WEEK_OF_YEAR) + offset);
 		calendar.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
 	    return sdf.format(calendar.getTime());
@@ -64,7 +76,7 @@ public class SpecialDatesUtility
 		SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
 		
 		Calendar calendar = Calendar.getInstance();
-		calendar.setFirstDayOfWeek(Calendar.MONDAY);
+		calendar.setFirstDayOfWeek(firstDayOfWeek);
 		calendar.set(Calendar.WEEK_OF_YEAR,calendar.get(Calendar.WEEK_OF_YEAR) + offset);
 		calendar.set(Calendar.DAY_OF_WEEK,Calendar.SUNDAY);
 	    return sdf.format(calendar.getTime());
