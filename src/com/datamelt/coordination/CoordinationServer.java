@@ -47,12 +47,13 @@ public class CoordinationServer extends Thread
     private static final String PROPERTIES_FILE 			= "server.properties";
     
     private static final String PROPERTY_FOLDER_LOGS		= "folder.logs";
-    private static final String PROPERTY_JSONFILES_FOLDER	= "folder.jsonfiles";
-    private static final String PROPERTY_JOBS_FILENAME		= "jobs.filename";
+    private static final String PROPERTY_FOLDER_JOBS		= "folder.jobs";
+    private static final String PROPERTY_FOLDER_REPORTS		= "folder.reports";
     private static final String PROPERTY_PORT 				= "server.port";
     private static final String PROPERTY_SCRIPT_FOLDER		= "script.folder";
     private static final String PROPERTY_SCRIPT_NAME		= "script.name";
-    
+    private static final String PROPERTY_COMMAND_FOLDER		= "command.folder";
+    private static final String PROPERTY_COMMAND_NAME		= "command.name";
     
     private static final int 	DEFAULT_PORT 				= 9000;
     private static final String DEFAULT_DATETIME_FORMAT		= "yyyy-MM-dd HH:mm:ss";
@@ -157,18 +158,10 @@ public class CoordinationServer extends Thread
     	server.serverStart = System.currentTimeMillis();
     	System.out.println(sdf.format(new Date()) + " - server start...");
 		System.out.println(sdf.format(new Date()) + " - using properties from: [" + server.propertiesFileFullname + "]");
-		File jsonFile = new File(server.getProperty(PROPERTY_JSONFILES_FOLDER) + "/" + server.getProperty(PROPERTY_JOBS_FILENAME));
-		if(jsonFile.exists())
-		{
-			server.jobManager = new JobManager(server.getProperty(PROPERTY_JSONFILES_FOLDER),server.getProperty(PROPERTY_JOBS_FILENAME));
-			server.jobManager.setFolderLogfiles(server.getProperty(PROPERTY_FOLDER_LOGS));
-			server.start();
-	        System.out.println(sdf.format(new Date()) +  " - waiting on: [" + server.serverSocket.getInetAddress() + "], port: [" + server.port + "] for connections");
-		}
-		else
-		{
-			throw new Exception("error: can not load json file with job definitions: [" + server.getProperty(PROPERTY_JSONFILES_FOLDER) + "/" + server.getProperty(PROPERTY_JOBS_FILENAME) + "]");
-		}
+		server.jobManager = new JobManager(server.getProperty(PROPERTY_FOLDER_JOBS),server.getProperty(PROPERTY_FOLDER_REPORTS));
+		server.jobManager.setFolderLogfiles(server.getProperty(PROPERTY_FOLDER_LOGS));
+		server.start();
+        System.out.println(sdf.format(new Date()) +  " - waiting on: [" + server.serverSocket.getInetAddress() + "], port: [" + server.port + "] for connections");
     }
     
     @Override
@@ -187,6 +180,8 @@ public class CoordinationServer extends Thread
                 {
 	                ClientHandler.setScriptName(getProperty(PROPERTY_SCRIPT_NAME));
 	                ClientHandler.setScriptFolder(getProperty(PROPERTY_SCRIPT_FOLDER));
+	                ClientHandler.setCommandName(getProperty(PROPERTY_COMMAND_NAME));
+	                ClientHandler.setCommandFolder(getProperty(PROPERTY_COMMAND_FOLDER));
 	                clientHandler.start();
                 }
                 else

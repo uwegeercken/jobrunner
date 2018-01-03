@@ -57,14 +57,6 @@ public class Job implements Comparable<Job>
 		this.path = path;
 	}
 	
-	public Job(String id, String filename, String path, String dependentJobId)
-	{
-		this.jobId = id;
-		this.jobFilename = filename;
-		this.path = path;
-		this.dependentJobs.add(dependentJobId);
-	}
-	
 	public String getJobId()
 	{
 		return jobId;

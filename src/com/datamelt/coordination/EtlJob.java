@@ -93,7 +93,7 @@ public class EtlJob extends Thread
 		{
 			client = new CoordinationClient(hostname,serverPort);
 			
-			while(jobStatus!=JobManager.STATUS_JOB_CAN_START)
+			while(jobStatus!=JobManager.STATUS_CAN_START)
 			{
 				jobStatus = (int)client.getServerMessage(ClientHandler.MESSAGE_JOB_START_STATUS + ClientHandler.DELIMITER + job.getJobId());
 				if(jobStatus==JobManager.STATUS_SCHEDULED_TIME_NOT_REACHED)
@@ -107,7 +107,7 @@ public class EtlJob extends Thread
 					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] waiting for dependent job(s) to finish. interval: [" + job.getCheckIntervalSeconds() + "] seconds, retries left: [" + (job.getMaxCheckIntervals() - job.getCheckIntervalCounter())+"]");
 					sleep(job.getCheckInterval());
 				}
-				else if(jobStatus!=JobManager.STATUS_JOB_CAN_START)
+				else if(jobStatus!=JobManager.STATUS_CAN_START)
 				{
 					System.out.println(sdf.format(new Date()) + " - job [" + job.getJobId()+ "] dependent job(s) not finished and max check intervals is reached");
 					break;
@@ -119,7 +119,7 @@ public class EtlJob extends Thread
 			ex.printStackTrace();
 		}
 		
-		if(jobStatus==JobManager.STATUS_JOB_CAN_START)
+		if(jobStatus==JobManager.STATUS_CAN_START)
 		{
 			ProcessBuilder processBuilder = getProcessBuilder();
 			

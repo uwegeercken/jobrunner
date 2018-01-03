@@ -31,13 +31,16 @@ public class Report implements Comparable<Report>
 	
 	private String reportId;
 	private String reportName;
+	private String reportFilename;
 	private String path;
 	private String targetPath;
 	private long group;
 	private Time scheduledStartTime;
 	private Time actualStartTime;
 	private Time finishedTime;
-	private Job dependentJob;
+	private boolean startRequested					= false;
+	private boolean running							= false;
+	private boolean finished						= false;
 	private boolean requiresJobFinished;
 	private long checkInterval 						= DEFAULT_CHECK_INTERVAL;
 	private long checkIntervalCounter				= 0;
@@ -53,20 +56,13 @@ public class Report implements Comparable<Report>
 	private String pentahoAttachmentName;
 
 	private ArrayList<String> parameters			= new ArrayList<String>();
+	private ArrayList<String> dependentJobs			= new ArrayList<String>();
 	
-	public Report(String id, String name, String path)
+	public Report(String id, String filename, String path)
 	{
 		this.reportId = id;
-		this.reportName = name;
+		this.reportFilename = filename;
 		this.path = path;
-	}
-	
-	public Report(String id, String name, String path, Job dependentJob)
-	{
-		this.reportId = id;
-		this.reportName = name;
-		this.path = path;
-		this.dependentJob = dependentJob;
 	}
 	
 	public String getReportId()
@@ -89,6 +85,16 @@ public class Report implements Comparable<Report>
 		this.reportName = reportName;
 	}
 	
+	public String getReportFilename()
+	{
+		return reportFilename;
+	}
+	
+	public void setReportFilename(String reportFilename)
+	{
+		this.reportFilename = reportFilename;
+	}
+	
 	public String getPath()
 	{
 		return path;
@@ -99,9 +105,19 @@ public class Report implements Comparable<Report>
 		this.path = path;
 	}
 
-	public String getServerPath()
+	public ArrayList<String> getDependentJobs()
 	{
-		return pentahoServer +":" + pentahoServerPort +"/" + pentahoBaseUrl + "/" + pentahoSolution + pentahoPath + "&render_mode=" + pentahoRenderMode + "&output-target=" + pentahoOutputTarget + "&locale=" + pentahoLocale;
+		return dependentJobs;
+	}
+	
+	public void addDependentJob(String jobId)
+	{
+		dependentJobs.add(jobId);
+	}
+	
+	public String getServerUrl()
+	{
+		return pentahoServer +":" + pentahoServerPort +"/" + pentahoBaseUrl + ":" + pentahoSolution + ":" + pentahoPath + ":" + reportFilename + "/" + "report?render_mode=" + pentahoRenderMode + "&output-target=" + pentahoOutputTarget + "&locale=" + pentahoLocale;
 	}
 	
 	public String getTargetPath()
@@ -114,16 +130,6 @@ public class Report implements Comparable<Report>
 		this.targetPath = targetPath;
 	}
 
-	public Job getDependentJob()
-	{
-		return dependentJob;
-	}
-
-	public void setDependentJob(Job dependentJob)
-	{
-		this.dependentJob = dependentJob;
-	}
-
 	public boolean getRequiresJobFinished()
 	{
 		return requiresJobFinished;
@@ -134,11 +140,6 @@ public class Report implements Comparable<Report>
 		this.requiresJobFinished = requiresJobFinished;
 	}
 	
-	public boolean getDependentJobFinished()
-	{
-		return dependentJob.isFinished();
-	}
-
 	public ArrayList<String> getParameters()
 	{
 		return parameters;
@@ -199,9 +200,19 @@ public class Report implements Comparable<Report>
 		return actualStartTime;
 	}
 
+	public void setActualStartTime(Time actualStartTime)
+	{
+		this.actualStartTime = actualStartTime;
+	}
+
 	public Time getFinishedTime()
 	{
 		return finishedTime;
+	}
+
+	public void setFinishedTime(Time finishedTime)
+	{
+		this.finishedTime = finishedTime;
 	}
 
 	public void setScheduledStartTime(int year, int month, int day, int hour, int minute, int second)
@@ -304,7 +315,36 @@ public class Report implements Comparable<Report>
 		this.pentahoAttachmentName = pentahoAttachmentName;
 	}
 
+	public boolean isFinished()
+	{
+		return finished;
+	}
 	
+	public boolean isRunning()
+	{
+		return running;
+	}
+	
+	public boolean isStartRequested()
+	{
+		return startRequested;
+	}
+	
+	public void setFinished(boolean finished)
+	{
+		this.finished = finished;
+	}
+
+	public void setRunning(boolean running)
+	{
+		this.running = running;
+	}
+	
+	public void setStartRequested(boolean startRequested)
+	{
+		this.startRequested = startRequested;
+	}
+
 	public long getGroup()
 	{
 		return group;

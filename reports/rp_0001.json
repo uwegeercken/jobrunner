@@ -14,9 +14,12 @@
 	"output-target": "pageable-pdf",
 	"locale": "de_DE",
 	"attachment_name": "absenzreport_zrh_bzod",
-	"scheduled_start_time": "23:16:00",
+	"scheduled_start_time": "18:11:00",
 	"check_interval": 3000,
 	"max_check_intervals": 5,
-	"parameters": {"parm_company": "Swissport","parm_date": "${monthFirstDay:-1:yyyy-MM-dd}", "parm_station": "ZRH", "parm_unit": "BZOD"}
+	"parameters": {"parm_company": "Swissport","parm_date": "${monthFirstDay:-1:yyyy-MM-dd}", "parm_station": "ZRH", "parm_unit": "BZOD"},
+	"depends_on_job": [
+		{"jobid": "etl_0001"}
+	]
 }
 

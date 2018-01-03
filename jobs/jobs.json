@@ -9,11 +9,7 @@
 			"check_interval": 3000,
 			"max_check_intervals": 5,
 			"parameters": {"jobnumber": "1","year": "${year:0:yyyy-MM-dd}","month": "${month:-3}"},
-			"log_level": "Minimal",
-			"run_reports": true,
-			"reports": [
-				{"id": "rp_0001"}
-			]
+			"log_level": "Minimal"
 		},
 		{
 			"id": "etl_0002",
@@ -27,11 +23,7 @@
 				{"jobid": "etl_0001"}
 			],
 			"parameters": {"jobnumber": "2"},
-			"log_level": "Basic",
-			"run_reports": false,
-			"reports": [
-
-			]
+			"log_level": "Basic"
 		},
 		{
 			"id": "etl_0003",
@@ -46,11 +38,7 @@
 				{"jobid":"etl_0001"}
 			],
 			"parameters": {"jobnumber": "2"},
-			"log_level": "Basic",
-			"run_reports": false,
-			"reports": [
-
-			]
+			"log_level": "Basic"
 		}
 	]
 }
