@@ -1,0 +1,26 @@
+{
+	"id": "welcome_back_0002",
+	"name": "Welcome Back LAGR",
+	"filename": "welcome_back.prpt",
+	"group": 1,
+	"path": "/home/uwe/development/git/jobrunner/prd",
+	"target_path": "/home/uwe/development/git/jobrunner/prd/output",
+	"pentaho_server": "http://prod.pentaho.swissport.aero",
+	"pentaho_server_port": 80,
+	"pentaho_base_url": "pentaho/api/repos/:public",
+	"pentaho_solution": "CH",
+	"pentaho_path": "EPX",
+	"render_mode": "REPORT",
+	"output-target": "pageable%2Fpdf",
+	"locale": "de_DE",
+	"attachment_name": "welcome_back_lagr",
+	"scheduled_start_time": "10:00:00",
+	"check_interval": 3000,
+	"max_check_intervals": 5,
+	"parameters": {"parm_company": "Swissport","parm_date": "2018-01-06", "parm_station": "ZRH", "parm_unit": "LAGR", "parm_work_area": "Ramp"},
+	"depends_on_job": [
+		{"jobid": "etl_0001"}
+	]
+}
+
+

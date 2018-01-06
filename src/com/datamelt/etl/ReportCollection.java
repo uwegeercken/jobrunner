@@ -59,4 +59,9 @@ public class ReportCollection
 	{
 		return reports.size();
 	}
+	
+	public void clear()
+	{
+		reports.clear();
+	}
 }

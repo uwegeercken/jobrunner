@@ -97,10 +97,11 @@ public class JobManager
 	private JobCollection jobs 											= new JobCollection();
 	private ReportCollection reports 									= new ReportCollection();
 	private String folderJobs											= null;
-	private String folderReports											= null;
+	private String folderReports										= null;
 	private String folderLogfiles										= null;
 	
 	private HashMap<String,String> jsonJobs								= new HashMap<String,String>();
+	private HashMap<String,String> jsonReports							= new HashMap<String,String>();
 	
 	public JobManager(String folderJobs, String folderReports) throws Exception
 	{
@@ -143,6 +144,18 @@ public class JobManager
 		if(jobId!=null && jsonJobs.containsKey(jobId))
 		{
 			return jsonJobs.get(jobId);
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public String getReportAsJson(String reportId)
+	{
+		if(reportId!=null && jsonReports.containsKey(reportId))
+		{
+			return jsonReports.get(reportId);
 		}
 		else
 		{
@@ -247,6 +260,12 @@ public class JobManager
 		loadJobs();
 	}
 	
+	public void reloadReports() throws Exception
+	{
+		reports.clear();
+		loadReports();
+	}
+	
 	private void loadJobs() throws Exception
 	{
 		File directory = new File(folderJobs);
@@ -255,8 +274,6 @@ public class JobManager
 		{
 		    if (file.isFile()) 
 		    {
-		    	System.out.println(file.getName());
-		    	
 				JSONParser parser = new JSONParser();
 				// capture all job ids
 				ArrayList<String> jobIds = new ArrayList<String>();
@@ -396,8 +413,6 @@ public class JobManager
 		{
 		    if (file.isFile()) 
 		    {
-		    	System.out.println(file.getName());
-		        
 	        	JSONParser parser = new JSONParser();
 	        	JSONObject jsonReport = (JSONObject) parser.parse(new FileReader(folderReports +"/" + file.getName()));
 	        	
@@ -416,6 +431,7 @@ public class JobManager
 	        	
 	        	if(reportId!= null && reportFileOk & !reportIdExists)
 	        	{
+	        		jsonReports.put(reportId,jsonReport.toString());
 	        		reportIds.add(reportId);
 	        		
 	        		Report report = new Report(reportId,reportFilename, reportPath);
@@ -522,7 +538,6 @@ public class JobManager
 	                	}
 		            	report.setParameters(parameters);
 	            	}
-	            	System.out.println(report.getServerUrl());
 	        		addReport(report);
 	        	}
 	        	else
@@ -533,11 +548,11 @@ public class JobManager
 	        		}
 	        		else if(reportId == null)
 	                {
-	        			System.out.println(sdf.format(new Date()) + " -  error: in file [" + file.getName() + "] report id is undefined. skipping data.");
+	        			System.out.println(sdf.format(new Date()) + " - error: in file [" + file.getName() + "] report id is undefined. skipping data.");
 	                }
 	        		else if(reportIdExists)
 	                {
-	        			System.out.println(sdf.format(new Date()) + " -  error: in file [" + file.getName() + "] report id [" + reportId + "] is defined multiple times. skipping data.");
+	        			System.out.println(sdf.format(new Date()) + " - error: in file [" + file.getName() + "] report id [" + reportId + "] is defined multiple times. skipping data.");
 	                }
 	        	}
 	        }
@@ -617,6 +632,19 @@ public class JobManager
 			return null;
 		}
 	}
+	
+	public String getReportScheduledStarttime(String reportId)
+	{
+		Report report = getReport(reportId);
+		if(report!=null)
+		{
+			return report.getScheduledStartTime().getTime(Time.DEFAULT_DATETIME_FORMAT);
+		}
+		else
+		{
+			return null;
+		}
+	}
 
 	public void resetJobs()
 	{
@@ -648,6 +676,31 @@ public class JobManager
 		if(job!=null)
 		{
 			resetJob(job);
+		}
+	}
+	
+	public void resetReport(Report report)
+	{
+		report.setActualStartTime(null);
+		report.setCheckIntervalCounter(0);
+		report.setRunning(false);
+		report.setFinishedTime(null);
+		report.setFinished(false);
+			
+		Calendar calendar = report.getScheduledStartTime().getCalendar();
+		int hours = calendar.get(Calendar.HOUR_OF_DAY);
+		int minutes = calendar.get(Calendar.MINUTE);
+		int seconds = calendar.get(Calendar.SECOND);
+	
+		report.setScheduledStartTime(new Time(hours,minutes,seconds));	
+	}
+
+	public void resetReport(String reportId)
+	{
+		Report report = getReport(reportId);
+		if(report!=null)
+		{
+			resetReport(report);
 		}
 	}
 	

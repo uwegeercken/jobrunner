@@ -54,6 +54,8 @@ public class CoordinationServer extends Thread
     private static final String PROPERTY_SCRIPT_NAME		= "script.name";
     private static final String PROPERTY_COMMAND_FOLDER		= "command.folder";
     private static final String PROPERTY_COMMAND_NAME		= "command.name";
+    private static final String PROPERTY_BASERVER_USERID	= "baserver.userid";
+    private static final String PROPERTY_BASERVER_PASSWORD	= "baserver.password";
     
     private static final int 	DEFAULT_PORT 				= 9000;
     private static final String DEFAULT_DATETIME_FORMAT		= "yyyy-MM-dd HH:mm:ss";
@@ -182,6 +184,8 @@ public class CoordinationServer extends Thread
 	                ClientHandler.setScriptFolder(getProperty(PROPERTY_SCRIPT_FOLDER));
 	                ClientHandler.setCommandName(getProperty(PROPERTY_COMMAND_NAME));
 	                ClientHandler.setCommandFolder(getProperty(PROPERTY_COMMAND_FOLDER));
+	                ClientHandler.setBaServerUserid(getProperty(PROPERTY_BASERVER_USERID));
+	                ClientHandler.setBaServerPassword(getProperty(PROPERTY_BASERVER_PASSWORD));
 	                clientHandler.start();
                 }
                 else
@@ -222,7 +226,7 @@ public class CoordinationServer extends Thread
     	System.out.println("For further functionality consult the API documentation and the handbook.");
     	System.out.println();
     	System.out.println("published as open source under the Apache License. read the licence notice");
-    	System.out.println("all code by uwe geercken, 2017. uwe.geercken@web.de");
+    	System.out.println("all code by uwe geercken, 2017-2018. uwe.geercken@web.de");
     	System.out.println();
     }
     

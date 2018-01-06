@@ -105,6 +105,10 @@ public class Report implements Comparable<Report>
 		this.path = path;
 	}
 
+	public String getOutputFilename()
+	{
+		return getTargetPath() + "/" + getPentahoAttachmentName() + ".pdf"; 
+	}
 	public ArrayList<String> getDependentJobs()
 	{
 		return dependentJobs;
@@ -117,7 +121,7 @@ public class Report implements Comparable<Report>
 	
 	public String getServerUrl()
 	{
-		return pentahoServer +":" + pentahoServerPort +"/" + pentahoBaseUrl + ":" + pentahoSolution + ":" + pentahoPath + ":" + reportFilename + "/" + "report?render_mode=" + pentahoRenderMode + "&output-target=" + pentahoOutputTarget + "&locale=" + pentahoLocale;
+		return pentahoServer +"/" + pentahoBaseUrl + ":" + pentahoSolution + ":" + pentahoPath + ":" + reportFilename + "/" + "report?renderMode=" + pentahoRenderMode + "&output-target=" + pentahoOutputTarget + "&locale=" + pentahoLocale;
 	}
 	
 	public String getTargetPath()
@@ -145,6 +149,16 @@ public class Report implements Comparable<Report>
 		return parameters;
 	}
 
+	public String getParametersString()
+	{
+		StringBuffer buffer = new StringBuffer();
+		for(int i=0;i<parameters.size();i++)
+		{
+			buffer.append(parameters.get(i));
+		}
+		return buffer.toString();
+	}
+	
 	public void setParameters(ArrayList<String> parameters)
 	{
 		this.parameters = parameters;

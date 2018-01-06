@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import com.datamelt.coordination.ClientHandler;
@@ -48,6 +49,8 @@ public class ReportJob extends Thread
 	
 	private static String commandName;
     private static String commandFolder;
+    private static String baServerUserid;
+    private static String baServerPassword;
 	
 	public ReportJob(Report report, int serverPort, String logfileFolder) throws Exception
 	{
@@ -67,14 +70,13 @@ public class ReportJob extends Thread
 	{
 		ArrayList <String>parameters = new ArrayList<String>();
 		parameters.add(commandFolder +"/" + commandName);
-		parameters.add(report.getServerUrl());
+		parameters.add("--output-file=" + logfileFolder + "/" + report.getReportId() + "_" + sdfLogs.format(new Date()) + ".log");
+		parameters.add("--no-check-certificate");
+		parameters.add("--output-document=" + report.getOutputFilename());
+		parameters.add(report.getServerUrl() + report.getParametersString() + "&userid=" + getBaServerUserid() + "&password=" + getBaServerPassword());
 		
-		System.out.println("report command: " + commandFolder +"/" + commandName + " " + report.getServerUrl());
+		//System.out.println("report command: " + Arrays.deepToString(parameters.toArray()));
     	
-		
-		
-		System.out.println("report parameters: " + Arrays.deepToString(report.getParameters().toArray()));
-		
 		ProcessBuilder pb = new ProcessBuilder(parameters);
 		
 		pb.directory(new File(report.getPath()));
@@ -126,7 +128,6 @@ public class ReportJob extends Thread
 			
 			File output = new File(logfileFolder + "/" + report.getReportId() + "_" + sdfLogs.format(new Date()) + ".log");
 			processBuilder.redirectOutput(output);
-			processBuilder.redirectError(output);
 			Process process = null;
 			try
 			{
@@ -189,4 +190,25 @@ public class ReportJob extends Thread
 	{
 		ReportJob.commandFolder = scriptFolder;
 	}
+
+	public static String getBaServerUserid()
+	{
+		return baServerUserid;
+	}
+
+	public static void setBaServerUserid(String baServerUserid)
+	{
+		ReportJob.baServerUserid = baServerUserid;
+	}
+
+	public static String getBaServerPassword()
+	{
+		return baServerPassword;
+	}
+
+	public static void setBaServerPassword(String baServerPassword)
+	{
+		ReportJob.baServerPassword = baServerPassword;
+	}
+	
 }

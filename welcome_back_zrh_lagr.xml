@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<project default="main" >
+        <description>
+		this file sets report variables required to generate a pentaho report.
+		it will call a generic ant task which will do the actual generation and mailing of the report.
+        </description>
+
+        <!-- include ant task which generates the date aliases using groovy -->
+        <include file="/home/SP_admin/tools/automatic_report_schedules_pentaho6/task_dates.xml" />
+
+	<!-- any initialization settings go here -->
+	<target name="init" description="initializing application" depends="groovydates.main">
+
+        </target>
+
+	<target name="main" description="main target" depends="init">
+		
+		<!-- server specific parameters -->
+		<property name="pentaho_server" value="http://dev.pentaho.swissport.aero"/>	
+		<property name="pentaho_server_port" value="80"/>	
+		<property name="pentaho_base_url" value="pentaho/api/repos/:public"/>	
+
+		<!-- report specific parameters -->
+		<property name="pentaho_report_name" value="welcome_back"/>	
+		<property name="pentaho_report_additional_url" value="&amp;parm_company=Swissport&amp;parm_date=${today}&amp;parm_station=ZRH&amp;parm_unit=LAGR&amp;parm_work_area=Ramp"/>
+		<property name="pentaho_attachment_name" value="welcome_back_lagr"/>
+		<property name="pentaho_attachment_extension" value=".pdf"/>
+		<property name="pentaho_report_extension" value=".prpt"/>
+		<property name="pentaho_solution" value="CH"/>
+		<property name="pentaho_path" value="EPX"/>
+
+		<!-- rendering specific parameters -->
+		<property name="pentaho_rendermode" value="REPORT"/>
+		<property name="pentaho_output-target" value="pageable%2Fpdf"/>
+		<property name="pentaho_locale" value="de_DE"/>
+
+
+		<!-- parameters for mailing the report -->
+		<property name="mail.subject" value="EPX report: Welcome Back ZRH LAGR"/>
+		<property name="mail.messagefile" value="mailmessage_pentaho_report.txt"/>
+		<property name="mail.to_list" value="sara.kreher@swissport.com"/>
+		<property name="mail.cc_list" value=""/>
+
+		
+		
+		<!-- call the main script which generates the report and mails it -->
+		<ant dir="/home/SP_admin/tools/automatic_report_schedules_pentaho6" antfile="task_generate_pentaho_report.xml" target="mailreport"/>
+	</target>
+</project>
+
+

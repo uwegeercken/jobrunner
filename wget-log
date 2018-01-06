@@ -1,0 +1,15 @@
+--2018-01-06 14:20:25--  http://prod.pentaho.swissport.aero/pentaho/api/repos/:public:CH:EPX:welcome_back.prpt/report?renderMode=REPORT
+Auflösen des Hostnamens prod.pentaho.swissport.aero (prod.pentaho.swissport.aero)… 10.36.0.59
+Verbindungsaufbau zu prod.pentaho.swissport.aero (prod.pentaho.swissport.aero)|10.36.0.59|:80 … verbunden.
+HTTP-Anforderung gesendet, auf Antwort wird gewartet … 302 Found
+Platz: http://prod.pentaho.swissport.aero/cas/login?service=http%3A%2F%2Fprod.pentaho.swissport.aero%2Fpentaho%2Fj_spring_cas_security_check%3Bjsessionid%3D281DB0D38F201609854D8B829F96EAC9 [folgend]
+--2018-01-06 14:20:25--  http://prod.pentaho.swissport.aero/cas/login?service=http%3A%2F%2Fprod.pentaho.swissport.aero%2Fpentaho%2Fj_spring_cas_security_check%3Bjsessionid%3D281DB0D38F201609854D8B829F96EAC9
+Verbindungsaufbau zu prod.pentaho.swissport.aero (prod.pentaho.swissport.aero)|10.36.0.59|:80 … verbunden.
+HTTP-Anforderung gesendet, auf Antwort wird gewartet … 200 OK
+Länge: 4364 (4.3K) [text/html]
+Wird in »/home/uwe/development/git/jobrunner/prd/output/welcome_back_all.pdf« gespeichert.
+
+                     /home/uwe/development   0%[                                                                                         ]       0  --.-KB/s               /home/uwe/development/git/jobrunner/prd/ou 100%[========================================================================================>]   4.26K  --.-KB/s    in 0.006s  
+
+2018-01-06 14:20:26 (664 KB/s) - »/home/uwe/development/git/jobrunner/prd/output/welcome_back_all.pdf« gespeichert [4364/4364]
+

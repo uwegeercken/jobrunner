@@ -49,7 +49,7 @@ public class ClientHandler extends Thread
     
     // list of possible messages
     // the "exit" message is explicitly excluded here
-    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "jobreset", "jobremove", "jobjson", "listjobs", "resetjobs", "reloadjobs", "numberofjobs", "nextjob","reportrun","reportgrouprun","reportstarttime","reportruntime","listreports","reportstartstatus"};
+    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "jobreset", "jobremove", "jobjson", "listjobs", "resetjobs", "reloadjobs", "numberofjobs", "nextjob","reportrun","reportgrouprun","reportstarttime","reportruntime","listreports","reportstartstatus", "reportjson", "reloadreports", "reportdependencies"};
     
     public static final String MESSAGE_UPTIME 				= "uptime";
     public static final String MESSAGE_EXIT 				= "exit";
@@ -81,6 +81,8 @@ public class ClientHandler extends Thread
     public static final String MESSAGE_REPORT_REMOVE		= "reportremove";
     public static final String MESSAGE_REPORT_JSON			= "reportjson";
     public static final String MESSAGE_LIST_REPORTS			= "listreports";
+    public static final String MESSAGE_RELOAD_REPORTS		= "reloadreports";
+    public static final String MESSAGE_REPORT_DEPENDENCIES	= "reportdependencies";
     
     public static final String DELIMITER					= ":";
     
@@ -94,6 +96,8 @@ public class ClientHandler extends Thread
     private static String scriptFolder;
     private static String commandName;
     private static String commandFolder;
+    private static String baServerUserid;
+    private static String baServerPassword;
     
     ClientHandler(Socket socket, JobManager jobManager, int serverPort, long serverStart) throws Exception
     {
@@ -198,6 +202,19 @@ public class ClientHandler extends Thread
             				sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,jobId, "not existing");
             			}
             		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_STARTTIME))
+            		{
+            			String reportId = parseId(serverObject);
+            			String reportStarttime = jobManager.getReportScheduledStarttime(reportId);
+            			if(reportStarttime!=null)
+            			{
+            				sendClientMessage(reportStarttime);
+            			}
+            			else
+            			{
+            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not existing");
+            			}
+            		}
             		else if(serverObject.startsWith(MESSAGE_JOB_JSON))
             		{
             			String jobId = parseId(serverObject);
@@ -209,6 +226,19 @@ public class ClientHandler extends Thread
             			else
             			{
             				sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,jobId, "not existing");
+            			}
+            		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_JSON))
+            		{
+            			String reportId = parseId(serverObject);
+        				Report report = jobManager.getReport(reportId);
+        				if(report!=null)
+        				{
+        					sendMessage(jobManager.getReportAsJson(reportId));
+            			}
+            			else
+            			{
+            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not existing");
             			}
             		}
             		else if(serverObject.startsWith(MESSAGE_JOB_RUNTIME))
@@ -237,6 +267,32 @@ public class ClientHandler extends Thread
             				sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,jobId, "not existing");
             			}
             		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_RUNTIME))
+            		{
+            			String reportId = parseId(serverObject);
+        				Report report = jobManager.getReport(reportId);
+        				if(report!=null)
+        				{
+            				if(report.getActualStartTime()!=null && report.getFinishedTime()!=null)
+            				{
+            					long reportStarttime = report.getActualStartTime().getTimeInMillis();
+            					long reportEndtime = report.getFinishedTime().getTimeInMillis();
+            					sendClientMessage(getRunTime(reportEndtime, reportStarttime));
+            				}
+            				else if(report.getActualStartTime()==null)
+            				{
+            					sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not started");
+            				}
+            				else
+            				{
+            					sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not finished");
+            				}
+            			}
+            			else
+            			{
+            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not existing");
+            			}
+            		}
             		else if(serverObject.startsWith(MESSAGE_JOB_DEPENDENCIES))
             		{
             			String jobId = parseId(serverObject);
@@ -248,6 +304,19 @@ public class ClientHandler extends Thread
             			else
             			{
             				sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,jobId, "not existing");
+            			}
+            		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_DEPENDENCIES))
+            		{
+            			String reportId = parseId(serverObject);
+        				Report report = jobManager.getReport(reportId);
+        				if(report!=null)
+        				{
+        					sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "depends on: " + report.getDependentJobs().toString());
+        				}
+            			else
+            			{
+            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not existing");
             			}
             		}
             		else if(serverObject.startsWith(MESSAGE_NEXT_JOB))
@@ -303,6 +372,20 @@ public class ClientHandler extends Thread
             				sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,jobId, "not existing");
             			}
             		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_RESET))
+            		{
+            			String reportId = parseId(serverObject);
+            			Report report = jobManager.getReport(reportId);
+        				if(report!=null)
+        				{
+        					jobManager.resetReport(report);
+        					sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "reset");
+        				}
+            			else
+            			{
+            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not existing");
+            			}
+            		}
             		else if(serverObject.startsWith(MESSAGE_JOB_REMOVE))
             		{
             			String jobId = parseId(serverObject);
@@ -317,11 +400,32 @@ public class ClientHandler extends Thread
             				sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,jobId, "not existing");
             			}
             		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_REMOVE))
+            		{
+            			String reportId = parseId(serverObject);
+            			Report report = jobManager.getReport(reportId);
+        				if(report!=null)
+        				{
+        					jobManager.removeReport(reportId);
+        					sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "removed");
+        				}
+            			else
+            			{
+            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not existing");
+            			}
+            		}
             		else if(serverObject.startsWith(MESSAGE_RELOAD_JOBS))
             		{
             			jobManager.reloadJobs();
             			
             			systemMessage("reloaded jobs");
+    	                sendClientMessage("ok");
+            		}
+            		else if(serverObject.startsWith(MESSAGE_RELOAD_REPORTS))
+            		{
+            			jobManager.reloadReports();
+            			
+            			systemMessage("reloaded reports");
     	                sendClientMessage("ok");
             		}
             		else if(serverObject.startsWith(MESSAGE_JOB_FINISHED))
@@ -389,6 +493,8 @@ public class ClientHandler extends Thread
 	            				ReportJob reportJob = new ReportJob(report, serverPort, jobManager.getFolderLogfiles());
 	            				ReportJob.setCommandFolder(commandFolder);
 	            				ReportJob.setCommandName(commandName);
+	            				ReportJob.setBaServerUserid(baServerUserid);
+	            				ReportJob.setBaServerPassword(baServerPassword);
 	            				systemMessage(CLIENT_MESSAGE_TYPE_REPORT,report.getReportId(), "activated run. scheduled: [" + report.getScheduledStartTime().getTime() + "]");
 	            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "activated run. scheduled: [" + report.getScheduledStartTime().getTime() + "]");
 	            				reportJob.start();
@@ -409,6 +515,45 @@ public class ClientHandler extends Thread
             			else
             			{
             				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not existing");
+            			}
+            		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_GROUP_RUN))
+            		{
+            			String groupId = parseId(serverObject);
+            			
+            			ArrayList<Report> reports = jobManager.getGroupReports(Long.parseLong(groupId));
+            			if(reports.size()>0)
+            			{
+            				for(int i=0;i<reports.size();i++)
+            				{
+	            				Report report = reports.get(i);
+	            				if(!report.isFinished() && !report.isRunning())
+		            			{
+		            				ReportJob reportJob = new ReportJob(report, serverPort, jobManager.getFolderLogfiles());
+		            				ReportJob.setCommandFolder(commandFolder);
+		            				ReportJob.setCommandName(commandName);
+		            				ReportJob.setBaServerUserid(baServerUserid);
+		            				ReportJob.setBaServerPassword(baServerPassword);
+		            				systemMessage(CLIENT_MESSAGE_TYPE_REPORT,report.getReportId(), "activated run. scheduled: [" + report.getScheduledStartTime().getTime() + "]");
+		            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,report.getReportId(), "activated run. scheduled: [" + report.getScheduledStartTime().getTime() + "]");
+		            				reportJob.start();
+		            			}
+		            			else
+		            			{
+		            				if(report.isFinished())
+		            				{
+		            					sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,report.getReportId(), "finished: [" + report.getFinishedTime().getTime() + "]");
+		            				}
+		            				else
+		            				{
+		            					sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,report.getReportId(), "running: [" + report.getActualStartTime().getTime() + "]");
+		            				}
+		            			}
+            				}
+            			}
+            			else
+            			{
+            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,groupId, "no reports found");
             			}
             		}
             		else
@@ -500,7 +645,27 @@ public class ClientHandler extends Thread
        	outputStream.flush();
     }
     
-    private String getRunTime(long endTime, long startTime)
+    public static String getBaServerUserid()
+	{
+		return baServerUserid;
+	}
+
+	public static void setBaServerUserid(String baServerUserid)
+	{
+		ClientHandler.baServerUserid = baServerUserid;
+	}
+
+	public static String getBaServerPassword()
+	{
+		return baServerPassword;
+	}
+
+	public static void setBaServerPassword(String baServerPassword)
+	{
+		ClientHandler.baServerPassword = baServerPassword;
+	}
+
+	private String getRunTime(long endTime, long startTime)
     {
     	long runTime = endTime - startTime;
     	long seconds = runTime/1000;

@@ -1,0 +1,45 @@
+{
+	"jobs":	[
+		{
+			"id": "etl_0001",
+			"name": "ETL Job 1",
+			"filename": "job_test_01.kjb",
+			"path": "/home/uwe/development/git/jobrunner/pdi",
+			"scheduled_start_time": "23:16:00",
+			"check_interval": 3000,
+			"max_check_intervals": 5,
+			"parameters": {"jobnumber": "1","year": "${year:0:yyyy-MM-dd}","month": "${month:-3}"},
+			"log_level": "Minimal"
+		},
+		{
+			"id": "etl_0002",
+			"name": "ETL Job  2",
+			"filename": "job_test_02.kjb",
+			"path": "/home/uwe/development/git/jobrunner/pdi",
+			"scheduled_start_time": "00:03:01",
+			"check_interval": 3000,
+			"max_check_intervals": 5,
+			"depends_on_job": [
+				{"jobid": "etl_0001"}
+			],
+			"parameters": {"jobnumber": "2"},
+			"log_level": "Basic"
+		},
+		{
+			"id": "etl_0003",
+			"name": "ETL Job 3",
+			"filename": "job_test_03.kjb",
+			"path": "/home/uwe/development/git/jobrunner/pdi",
+			"scheduled_start_time": "00:12:00",
+			"check_interval": 10000,
+			"max_check_intervals": 5,
+			"depends_on_job": [
+				{"jobid": "etl_0002"},
+				{"jobid":"etl_0001"}
+			],
+			"parameters": {"jobnumber": "2"},
+			"log_level": "Basic"
+		}
+	]
+}
+
