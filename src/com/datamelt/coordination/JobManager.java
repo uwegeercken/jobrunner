@@ -661,6 +661,7 @@ public class JobManager
 		job.setRunning(false);
 		job.setFinishedTime(null);
 		job.setFinished(false);
+		job.setExitCode(0);
 			
 		Calendar calendar = job.getScheduledStartTime().getCalendar();
 		int hours = calendar.get(Calendar.HOUR_OF_DAY);
@@ -686,6 +687,7 @@ public class JobManager
 		report.setRunning(false);
 		report.setFinishedTime(null);
 		report.setFinished(false);
+		report.setExitCode(0);
 			
 		Calendar calendar = report.getScheduledStartTime().getCalendar();
 		int hours = calendar.get(Calendar.HOUR_OF_DAY);
@@ -745,7 +747,6 @@ public class JobManager
 					else
 					{
 						status = STATUS_CAN_START;
-						
 					}
 				}
 			}
@@ -760,9 +761,39 @@ public class JobManager
 	public int getReportStatus(Report report)
 	{
 		int status = STATUS_UNDEFINED;
-		
-		status = STATUS_CAN_START;
-		
+		if(!getReportScheduledTimeReached(report))
+		{
+			status = STATUS_SCHEDULED_TIME_NOT_REACHED;
+		}
+		else
+		{
+			ArrayList<String> dependentJobs = report.getDependentJobs();
+			if(dependentJobs!=null && dependentJobs.size()>0)
+			{
+				for(int i=0;i<dependentJobs.size();i++)
+				{
+					Job dependentJob = getJob(dependentJobs.get(i));
+					if(dependentJob!=null && !dependentJob.isFinished())
+					{
+						status = STATUS_DEPENDENT_JOB_NOT_FINISHED;
+						break;
+					}
+					else if(dependentJob!=null && dependentJob.isFinished() && dependentJob.getExitCode()>0)
+					{
+						status = STATUS_DEPENDENT_JOB_BAD_EXIT_CODE;
+						break;
+					}
+					else
+					{
+						status = STATUS_CAN_START;
+					}
+				}
+			}
+			else
+			{
+				status = STATUS_CAN_START;
+			}
+		}
 		return status;
 	}
 
@@ -802,6 +833,19 @@ public class JobManager
 			if(report.getGroup() == group)
 			{
 				groupReports.add(report);
+			}
+		}
+		return groupReports;
+	}
+	
+	public ArrayList<String> getGroupReportsIds(long group)
+	{
+		ArrayList<String> groupReports = new ArrayList<String>();
+		for(Report report : reports.getReports())
+		{
+			if(report.getGroup() == group)
+			{
+				groupReports.add(report.getReportId());
 			}
 		}
 		return groupReports;

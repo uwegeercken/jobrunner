@@ -141,6 +141,7 @@ public class ReportJob extends Thread
 		    	
 				process = processBuilder.start();
 			    int exitCode = process.waitFor();
+			    report.setExitCode(exitCode);
 			    report.setRunning(false);
 			    report.setFinished(true);
 			    report.setFinishedTime(new Time(Calendar.getInstance()));

@@ -49,7 +49,38 @@ public class ClientHandler extends Thread
     
     // list of possible messages
     // the "exit" message is explicitly excluded here
-    public static final String[] MESSAGES					= {"uptime","processid","hello","jobfinished", "jobcanstart", "jobstartstatus", "jobstarttime", "jobrun", "jobexitcode", "jobruntime", "jobdependencies", "jobreset", "jobremove", "jobjson", "listjobs", "resetjobs", "reloadjobs", "numberofjobs", "nextjob","reportrun","reportgrouprun","reportstarttime","reportruntime","listreports","reportstartstatus", "reportjson", "reloadreports", "reportdependencies"};
+    public static final String[] MESSAGES					= {
+    		"uptime",
+    		"processid",
+    		"hello",
+    		"jobfinished", 
+    		"jobcanstart",
+    		"jobstartstatus",
+    		"jobstarttime",
+    		"jobrun",
+    		"jobexitcode",
+    		"jobruntime", 
+    		"jobdependencies", 
+    		"jobreset", 
+    		"jobremove", 
+    		"jobjson", 
+    		"listjobs", 
+    		"resetjobs", 
+    		"reloadjobs", 
+    		"numberofjobs", 
+    		"nextjob",
+    		"reportrun",
+    		"reportgrouprun",
+    		"reportstarttime",
+    		"reportruntime",
+    		"listreports", 
+    		"listgroupreports", 
+    		"reportstartstatus", 
+    		"reportjson", 
+    		"reloadreports", 
+    		"reportdependencies",
+    		"reportexitcode"
+    		};
     
     public static final String MESSAGE_UPTIME 				= "uptime";
     public static final String MESSAGE_EXIT 				= "exit";
@@ -81,8 +112,10 @@ public class ClientHandler extends Thread
     public static final String MESSAGE_REPORT_REMOVE		= "reportremove";
     public static final String MESSAGE_REPORT_JSON			= "reportjson";
     public static final String MESSAGE_LIST_REPORTS			= "listreports";
+    public static final String MESSAGE_LIST_GROUP_REPORTS	= "listgroupreports";
     public static final String MESSAGE_RELOAD_REPORTS		= "reloadreports";
     public static final String MESSAGE_REPORT_DEPENDENCIES	= "reportdependencies";
+    public static final String MESSAGE_REPORT_EXIT_CODE		= "reportexitcode";
     
     public static final String DELIMITER					= ":";
     
@@ -335,21 +368,40 @@ public class ClientHandler extends Thread
             		}
             		else if(serverObject.startsWith(MESSAGE_LIST_JOBS))
             		{
-        					sendClientMessage("list of jobs: " + Arrays.deepToString(jobManager.getJobList()));
+        				sendClientMessage("list of jobs: " + Arrays.deepToString(jobManager.getJobList()));
             		}
             		else if(serverObject.startsWith(MESSAGE_LIST_REPORTS))
             		{
-        					sendClientMessage("list of reports: " + Arrays.deepToString(jobManager.getReportList()));
+        				sendClientMessage("list of reports: " + Arrays.deepToString(jobManager.getReportList()));
+            		}
+            		else if(serverObject.startsWith(MESSAGE_LIST_GROUP_REPORTS))
+            		{
+            			String groupId = parseId(serverObject);
+            			ArrayList<String> reports = jobManager.getGroupReportsIds(Long.parseLong(groupId));
+            			if(reports.size()>0)
+            			{
+            				sendClientMessage("list of reports, group [" + groupId + "]: " + Arrays.deepToString(reports.toArray()));
+            			}
+            			else
+            			{
+            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT, groupId, "no reports found");
+            			}
             		}
             		else if(serverObject.startsWith(MESSAGE_NUMBER_OF_JOBS))
             		{
-        					sendClientMessage("number of jobs: [" + jobManager.getNumberOfJobs() + "]");
+        				sendClientMessage("number of jobs: [" + jobManager.getNumberOfJobs() + "]");
             		}
             		else if(serverObject.startsWith(MESSAGE_JOB_EXIT_CODE))
             		{
             			String jobId = parseId(serverObject);
             			int exitCode = jobManager.getJob(jobId).getExitCode();
            				sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,jobId, exitCode);
+            		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_EXIT_CODE))
+            		{
+            			String reportId = parseId(serverObject);
+            			int exitCode = jobManager.getReport(reportId).getExitCode();
+           				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, exitCode);
             		}
             		else if(serverObject.startsWith(MESSAGE_RESET_JOBS))
             		{

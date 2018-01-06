@@ -54,6 +54,7 @@ public class Report implements Comparable<Report>
 	private String pentahoOutputTarget;
 	private String pentahoLocale;
 	private String pentahoAttachmentName;
+	private int exitCode							= 0;
 
 	private ArrayList<String> parameters			= new ArrayList<String>();
 	private ArrayList<String> dependentJobs			= new ArrayList<String>();
@@ -369,6 +370,16 @@ public class Report implements Comparable<Report>
 		this.group = group;
 	}
 
+	public int getExitCode()
+	{
+		return exitCode;
+	}
+
+	public void setExitCode(int exitCode)
+	{
+		this.exitCode = exitCode;
+	}
+	
 	@Override
 	public int compareTo(Report arg0)
 	{
