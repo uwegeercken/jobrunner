@@ -103,12 +103,15 @@ public class JobManager
 	private HashMap<String,String> jsonJobs								= new HashMap<String,String>();
 	private HashMap<String,String> jsonReports							= new HashMap<String,String>();
 	
+	private ArrayList<String> jobIds 									= new ArrayList<String>();
+	private ArrayList<String> reportIds 								= new ArrayList<String>();
+	
 	public JobManager(String folderJobs, String folderReports) throws Exception
 	{
 		this.folderJobs = folderJobs;
 		this.folderReports = folderReports;
-		loadJobs();
-    	loadReports();
+		loadAllJobs();
+    	loadAllReports();
 	}
 
 	public JobManager(ArrayList<Job> jobs, ArrayList<Report> reports)
@@ -207,19 +210,36 @@ public class JobManager
 		
 	}
 	
+	public boolean existsReportId(String reportId)
+	{
+		return reportIds.contains(reportId);
+	}
+	
+	public boolean existsJobId(String jobId)
+	{
+		return jobIds.contains(jobId);
+	}
+	
 	public void removeJob(String jobId)
 	{
-		int counter=0;
+		int found=-1;
 		if(jobId!=null)
 		{
-			for(Job job : jobs.getJobs())
+			for(int i=0;i< jobs.getJobs().size();i++)
 			{
+				Job job = jobs.getJobs().get(i);
 				if(job.getJobId().equals(jobId))
 				{
-					jobs.removeJob(counter);;
+					jobIds.remove(jobId);
+					found=i;
+					break;
 				}
-				counter++;
+
 			}
+		}
+		if(found>-1)
+		{
+			jobs.removeJob(found);
 		}
 	}
 
@@ -240,33 +260,40 @@ public class JobManager
 	
 	public void removeReport(String reportId)
 	{
-		int counter=0;
+		int found=-1;
 		if(reportId!=null)
 		{
-			for(Report report : reports.getReports())
+			for(int i=0;i< reports.getReports().size();i++)
 			{
+				Report report = reports.getReports().get(i);
 				if(report.getReportId().equals(reportId))
 				{
-					reports.removeReport(counter);;
+					reportIds.remove(reportId);
+					found=i;
+					break;
 				}
-				counter++;
 			}
 		}
+		if(found>-1)
+		{
+			reports.removeReport(found);
+		}
+		
 	}
 	
 	public void reloadJobs() throws Exception
 	{
 		jobs.clear();
-		loadJobs();
+		loadAllJobs();
 	}
 	
 	public void reloadReports() throws Exception
 	{
 		reports.clear();
-		loadReports();
+		loadAllReports();
 	}
 	
-	private void loadJobs() throws Exception
+	private void loadAllJobs() throws Exception
 	{
 		File directory = new File(folderJobs);
 		File[] listOfFiles = directory.listFiles();
@@ -274,290 +301,311 @@ public class JobManager
 		{
 		    if (file.isFile()) 
 		    {
-				JSONParser parser = new JSONParser();
-				// capture all job ids
-				ArrayList<String> jobIds = new ArrayList<String>();
-				
-				try
-				{
-					JSONObject jsonObject  = (JSONObject) parser.parse(new FileReader(folderJobs +"/" + file.getName()));
-					
-					JSONArray jobs = (JSONArray) jsonObject.get(JSON_KEY_JOBS);
-		            Iterator<JSONObject> iterator = jobs.iterator();
-		            while (iterator.hasNext()) 
-		            {
-		            	JSONObject jsonJob = iterator.next();
-		            	
-		            	String jobId = (String) jsonJob.get(JSON_KEY_JOB_ID);
-		            	String jobFilename = (String) jsonJob.get(JSON_KEY_JOB_FILENAME);
-		            	String jobPath = (String) jsonJob.get(JSON_KEY_JOB_PATH);
-		
-		            	boolean idExists = false;
-		            	
-		            	if(jobId!=null && !jobId.trim().equals(""))
-		            	{
-		            		idExists = jobIds.contains(jobId);
-		            	}
-		            	
-		            	boolean fileOk = checkFileOk(jobPath, jobFilename);
-		            	
-		            	if(jobId!= null && fileOk & !idExists)
-		            	{
-			            	jsonJobs.put(jobId,jsonJob.toString());
-		            		
-		            		jobIds.add(jobId);
-		            		
-		            		Job job = new Job(jobId,jobFilename,jobPath);
-			            	
-		            		if(jsonJob.get(JSON_KEY_JOB_NAME)!=null)
-			            	{
-			            		job.setJobName((String) jsonJob.get(JSON_KEY_JOB_NAME));	
-			            	}
-			            	if(jsonJob.get(JSON_KEY_JOB_SCHEDULED_START_TIME)!=null)
-			            	{
-			            		String parts[] = ((String) jsonJob.get(JSON_KEY_JOB_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
-			            		if(parts.length==3)
-			            		{
-			            			int hours = Integer.parseInt(parts[0]);
-			            			int minutes = Integer.parseInt(parts[1]);
-			            			int seconds = Integer.parseInt(parts[2]);
-			            			job.setScheduledStartTime(new Time(hours,minutes,seconds));
-			            		}
-			            		else
-			            		{
-			            			throw new Exception("invalid scheduled start time definition. correct format is: [HH:mm:ss]");
-			            		}
-			            	}
-			            	if(jsonJob.get(JSON_KEY_JOB_CHECK_INTERVAL)!=null)
-			            	{
-			            		job.setCheckInterval((long) jsonJob.get(JSON_KEY_JOB_CHECK_INTERVAL));	
-			            	}
-			            	if(jsonJob.get(JSON_KEY_JOB_LOG_LEVEL)!=null)
-			            	{
-			            		job.setLogLevel((String) jsonJob.get(JSON_KEY_JOB_LOG_LEVEL));	
-			            	}
-			            	if(jsonJob.get(JSON_KEY_JOB_MAX_CHECK_INTERVALS)!=null)
-			            	{
-			            		job.setMaxCheckIntervals((long) jsonJob.get(JSON_KEY_JOB_MAX_CHECK_INTERVALS));	
-			            	}
-			            	if(jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB)!=null)
-			            	{
-			            		JSONArray dependentJobs = (JSONArray) jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB);
-			            		for(int i=0;i< dependentJobs.size();i++)
-			                	{
-			            			JSONObject dependentJob = (JSONObject) dependentJobs.get(i);
-			            			job.addDependentJob((String) dependentJob.get(JSON_KEY_JOB_DEPENDENT_JOB_ID));
-			            		}
-			            	}
-			            	if(jsonJob.get(JSON_KEY_JOB_PARAMETERS)!=null)
-			            	{
-			            		JSONObject jsonParameters = (JSONObject) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
-			            		
-			            		ArrayList<String>parameters = new ArrayList<String>();
-		
-			                	for(Object key: jsonParameters.keySet())
-			                	{
-			                		String value = (String) jsonParameters.get(key);
-			                		
-			                		// translate variables to their real value
-			                		if(VariableReplacer.isVariable(value))
-			                		{
-			                			String variableName = VariableReplacer.getVariableName(value);
-			                			int offset = VariableReplacer.getOffset(value);
-			                			int realValue = DateTimeUtility.getFieldValue(variableName,offset);
-			                		
-			                			parameters.add("-param:" + key + "=" + realValue);
-			                		}
-			                		else
-			                		{
-			                			parameters.add("-param:" + key + "=" + value);
-			                		}
-			                	}
-			                	
-				            	job.setParameters(parameters);
-			            	}
-			        		addJob(job);
-		            	}
-		            	else
-		            	{
-		            		if(!fileOk)
-		            		{
-		            			System.out.println(sdf.format(new Date()) + " - error: the file [" + jobFilename + "] in folder [" + jobPath + "] is not existing or can not be read. skipping data.");
-		            		}
-		            		else if(jobId == null)
-			                {
-		            			System.out.println(sdf.format(new Date()) + " -  error: job id is undefined. skipping data.");
-			                }
-		            		else if(idExists)
-			                {
-		            			System.out.println(sdf.format(new Date()) + " -  error: job id [" + jobId + "] is defined multiple times. skipping data.");
-			                }
-		            	}
-		            }
-				}
-				catch(Exception ex)
-				{
-					ex.printStackTrace();
-				}
-		    }		
+		    	loadJob(file);
+		    }
 		}
 	}
 	
-	private void loadReports() throws Exception
+	private Job loadJob(File file) throws Exception
 	{
-		ArrayList<String> reportIds = new ArrayList<String>(); 
-		
+		JSONParser parser = new JSONParser();
+		Job job = null;
+		try
+		{
+			JSONObject jsonObject  = (JSONObject) parser.parse(new FileReader(folderJobs +"/" + file.getName()));
+			
+			JSONArray jobs = (JSONArray) jsonObject.get(JSON_KEY_JOBS);
+            Iterator<JSONObject> iterator = jobs.iterator();
+            while (iterator.hasNext()) 
+            {
+            	JSONObject jsonJob = iterator.next();
+            	
+            	String jobId = (String) jsonJob.get(JSON_KEY_JOB_ID);
+            	String jobFilename = (String) jsonJob.get(JSON_KEY_JOB_FILENAME);
+            	String jobPath = (String) jsonJob.get(JSON_KEY_JOB_PATH);
+
+            	boolean idExists = false;
+            	
+            	if(jobId!=null && !jobId.trim().equals(""))
+            	{
+            		idExists = jobIds.contains(jobId);
+            	}
+            	
+            	boolean fileOk = checkFileOk(jobPath, jobFilename);
+            	
+            	if(jobId!= null && fileOk & !idExists)
+            	{
+	            	jsonJobs.put(jobId,jsonJob.toString());
+            		
+            		jobIds.add(jobId);
+            		
+            		job = new Job(jobId,jobFilename,jobPath);
+	            	
+            		if(jsonJob.get(JSON_KEY_JOB_NAME)!=null)
+	            	{
+	            		job.setJobName((String) jsonJob.get(JSON_KEY_JOB_NAME));	
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_SCHEDULED_START_TIME)!=null)
+	            	{
+	            		String parts[] = ((String) jsonJob.get(JSON_KEY_JOB_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
+	            		if(parts.length==3)
+	            		{
+	            			int hours = Integer.parseInt(parts[0]);
+	            			int minutes = Integer.parseInt(parts[1]);
+	            			int seconds = Integer.parseInt(parts[2]);
+	            			job.setScheduledStartTime(new Time(hours,minutes,seconds));
+	            		}
+	            		else
+	            		{
+	            			throw new Exception("invalid scheduled start time definition. correct format is: [HH:mm:ss]");
+	            		}
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_CHECK_INTERVAL)!=null)
+	            	{
+	            		job.setCheckInterval((long) jsonJob.get(JSON_KEY_JOB_CHECK_INTERVAL));	
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_LOG_LEVEL)!=null)
+	            	{
+	            		job.setLogLevel((String) jsonJob.get(JSON_KEY_JOB_LOG_LEVEL));	
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_MAX_CHECK_INTERVALS)!=null)
+	            	{
+	            		job.setMaxCheckIntervals((long) jsonJob.get(JSON_KEY_JOB_MAX_CHECK_INTERVALS));	
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB)!=null)
+	            	{
+	            		JSONArray dependentJobs = (JSONArray) jsonJob.get(JSON_KEY_JOB_DEPENDS_ON_JOB);
+	            		for(int i=0;i< dependentJobs.size();i++)
+	                	{
+	            			JSONObject dependentJob = (JSONObject) dependentJobs.get(i);
+	            			job.addDependentJob((String) dependentJob.get(JSON_KEY_JOB_DEPENDENT_JOB_ID));
+	            		}
+	            	}
+	            	if(jsonJob.get(JSON_KEY_JOB_PARAMETERS)!=null)
+	            	{
+	            		JSONObject jsonParameters = (JSONObject) jsonJob.get(JSON_KEY_JOB_PARAMETERS);
+	            		
+	            		ArrayList<String>parameters = new ArrayList<String>();
+
+	                	for(Object key: jsonParameters.keySet())
+	                	{
+	                		String value = (String) jsonParameters.get(key);
+	                		
+	                		// translate variables to their real value
+	                		if(VariableReplacer.isVariable(value))
+	                		{
+	                			String variableName = VariableReplacer.getVariableName(value);
+	                			int offset = VariableReplacer.getOffset(value);
+	                			int realValue = DateTimeUtility.getFieldValue(variableName,offset);
+	                		
+	                			parameters.add("-param:" + key + "=" + realValue);
+	                		}
+	                		else
+	                		{
+	                			parameters.add("-param:" + key + "=" + value);
+	                		}
+	                	}
+	                	
+		            	job.setParameters(parameters);
+	            	}
+	        		addJob(job);
+            	}
+            	else
+            	{
+            		if(!fileOk)
+            		{
+            			System.out.println(sdf.format(new Date()) + " - error: the file [" + jobFilename + "] in folder [" + jobPath + "] is not existing or can not be read. skipping data.");
+            		}
+            		else if(jobId == null)
+	                {
+            			System.out.println(sdf.format(new Date()) + " -  error: job id is undefined. skipping data.");
+	                }
+            		else if(idExists)
+	                {
+            			System.out.println(sdf.format(new Date()) + " -  error: job id [" + jobId + "] is defined multiple times. skipping data.");
+	                }
+            	}
+            }
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+		return job;
+	}
+	
+	public Job addJob(String filename) throws Exception
+	{
+		return loadJob(new File(filename));
+	}
+	
+	public Report addReport(String filename) throws Exception
+	{
+		return loadReport(new File(filename));
+	}
+	
+	private void loadAllReports() throws Exception
+	{
 		File directory = new File(folderReports);
 		File[] listOfFiles = directory.listFiles();
 		for (File file : listOfFiles)
 		{
 		    if (file.isFile()) 
 		    {
-	        	JSONParser parser = new JSONParser();
-	        	JSONObject jsonReport = (JSONObject) parser.parse(new FileReader(folderReports +"/" + file.getName()));
-	        	
-	        	String reportId = (String) jsonReport.get(JSON_KEY_REPORT_ID);
-	        	String reportFilename = (String) jsonReport.get(JSON_KEY_REPORT_FILENAME);
-	        	String reportPath = (String) jsonReport.get(JSON_KEY_REPORT_PATH);
-	
-	        	boolean reportIdExists = false;
-	        	
-	        	if(reportId!=null && !reportId.trim().equals(""))
-	        	{
-	        		reportIdExists = reportIds.contains(reportId);
-	        	}
-	        	
-	        	boolean reportFileOk = checkFileOk(reportPath, reportFilename);
-	        	
-	        	if(reportId!= null && reportFileOk & !reportIdExists)
-	        	{
-	        		jsonReports.put(reportId,jsonReport.toString());
-	        		reportIds.add(reportId);
-	        		
-	        		Report report = new Report(reportId,reportFilename, reportPath);
-	
-	        		if(jsonReport.get(JSON_KEY_REPORT_NAME)!=null)
-	            	{
-	            		report.setReportName((String) jsonReport.get(JSON_KEY_REPORT_NAME));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)!=null)
-	            	{
-	        			String parts[] = ((String) jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
-	            		if(parts.length==3)
-	            		{
-	                		try
-	                		{
-	                			int hours = Integer.parseInt(parts[0]);
-	                			int minutes = Integer.parseInt(parts[1]);
-	                			int seconds = Integer.parseInt(parts[2]);
-	                			report.setScheduledStartTime(new Time(hours,minutes,seconds));
-	                		}
-	                		catch(Exception ex)
-	                		{
-	                			ex.printStackTrace();
-	                		}
-	            		}
-	            		else
-	            		{
-	            			throw new Exception("invalid scheduled start time. correct format is: [HH:mm:ss]");
-	            		}
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_DEPENDS_ON_JOB)!=null)
-	            	{
-	            		JSONArray dependentJobs = (JSONArray) jsonReport.get(JSON_KEY_REPORT_DEPENDS_ON_JOB);
-	            		for(int i=0;i< dependentJobs.size();i++)
-	                	{
-	            			JSONObject dependentJob = (JSONObject) dependentJobs.get(i);
-	            			report.addDependentJob((String) dependentJob.get(JSON_KEY_JOB_DEPENDENT_JOB_ID));
-	            		}
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER)!=null)
-	            	{
-	            		report.setPentahoServer((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER_PORT)!=null)
-	            	{
-	            		report.setPentahoServerPort((long) jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER_PORT));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_BASE_URL)!=null)
-	            	{
-	            		report.setPentahoBaseUrl((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_BASE_URL));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_SOLUTION)!=null)
-	            	{
-	            		report.setPentahoSolution((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_SOLUTION));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_PATH)!=null)
-	            	{
-	            		report.setPentahoPath((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_PATH));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_RENDER_MODE)!=null)
-	            	{
-	            		report.setPentahoRenderMode((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_RENDER_MODE));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_OUTPUT_TARGET)!=null)
-	            	{
-	            		report.setPentahoOutputTarget((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_OUTPUT_TARGET));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_LOCALE)!=null)
-	            	{
-	            		report.setPentahoLocale((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_LOCALE));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_ATTACHMENT_NAME)!=null)
-	            	{
-	            		report.setPentahoAttachmentName((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_ATTACHMENT_NAME));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL)!=null)
-	            	{
-	            		report.setCheckInterval((long) jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_GROUP)!=null)
-	            	{
-	            		report.setGroup((long) jsonReport.get(JSON_KEY_REPORT_GROUP));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_TARGET_PATH)!=null)
-	            	{
-	            		report.setTargetPath((String) jsonReport.get(JSON_KEY_REPORT_TARGET_PATH));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS)!=null)
-	            	{
-	            		report.setMaxCheckIntervals((long) jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS));	
-	            	}
-	            	if(jsonReport.get(JSON_KEY_REPORT_PARAMETERS)!=null)
-	            	{
-	            		JSONObject jsonParameters = (JSONObject) jsonReport.get(JSON_KEY_REPORT_PARAMETERS);
-	
-	            		ArrayList<String>parameters = new ArrayList<String>();
-	
-	                	for(Object key: jsonParameters.keySet())
-	                	{
-	                		String value = (String) jsonParameters.get(key);
-	                		String keyValue = getParameterKeyValue((String)key, value);
-	                		
-	                		parameters.add("&" + keyValue);
-	                	}
-		            	report.setParameters(parameters);
-	            	}
-	        		addReport(report);
-	        	}
-	        	else
-	        	{
-	        		if(!reportFileOk)
-	        		{
-	        			System.out.println(sdf.format(new Date()) + " - error: in file [" + file.getName() + "] report [" + reportPath + "/" + reportFilename + "] is not existing or can not be read. skipping data.");
-	        		}
-	        		else if(reportId == null)
-	                {
-	        			System.out.println(sdf.format(new Date()) + " - error: in file [" + file.getName() + "] report id is undefined. skipping data.");
-	                }
-	        		else if(reportIdExists)
-	                {
-	        			System.out.println(sdf.format(new Date()) + " - error: in file [" + file.getName() + "] report id [" + reportId + "] is defined multiple times. skipping data.");
-	                }
-	        	}
-	        }
+		    	loadReport(file);
+		    }
 		}
 	}
+	
+	private Report loadReport(File file) throws Exception
+	{
+    	JSONParser parser = new JSONParser();
+    	JSONObject jsonReport = (JSONObject) parser.parse(new FileReader(folderReports +"/" + file.getName()));
+    	
+    	String reportId = (String) jsonReport.get(JSON_KEY_REPORT_ID);
+    	String reportFilename = (String) jsonReport.get(JSON_KEY_REPORT_FILENAME);
+    	String reportPath = (String) jsonReport.get(JSON_KEY_REPORT_PATH);
+
+    	Report report = null;
+    	
+    	boolean reportIdExists = false;
+    	
+    	if(reportId!=null && !reportId.trim().equals(""))
+    	{
+    		reportIdExists = reportIds.contains(reportId);
+    	}
+    	
+    	boolean reportFileOk = checkFileOk(reportPath, reportFilename);
+    	
+    	if(reportId!= null && reportFileOk & !reportIdExists)
+    	{
+    		jsonReports.put(reportId,jsonReport.toString());
+    		reportIds.add(reportId);
+    		
+    		report = new Report(reportId,reportFilename, reportPath);
+
+    		if(jsonReport.get(JSON_KEY_REPORT_NAME)!=null)
+        	{
+        		report.setReportName((String) jsonReport.get(JSON_KEY_REPORT_NAME));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)!=null)
+        	{
+    			String parts[] = ((String) jsonReport.get(JSON_KEY_REPORT_SCHEDULED_START_TIME)).split(TIME_DELIMITER);
+        		if(parts.length==3)
+        		{
+            		try
+            		{
+            			int hours = Integer.parseInt(parts[0]);
+            			int minutes = Integer.parseInt(parts[1]);
+            			int seconds = Integer.parseInt(parts[2]);
+            			report.setScheduledStartTime(new Time(hours,minutes,seconds));
+            		}
+            		catch(Exception ex)
+            		{
+            			ex.printStackTrace();
+            		}
+        		}
+        		else
+        		{
+        			throw new Exception("invalid scheduled start time. correct format is: [HH:mm:ss]");
+        		}
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_DEPENDS_ON_JOB)!=null)
+        	{
+        		JSONArray dependentJobs = (JSONArray) jsonReport.get(JSON_KEY_REPORT_DEPENDS_ON_JOB);
+        		for(int i=0;i< dependentJobs.size();i++)
+            	{
+        			JSONObject dependentJob = (JSONObject) dependentJobs.get(i);
+        			report.addDependentJob((String) dependentJob.get(JSON_KEY_JOB_DEPENDENT_JOB_ID));
+        		}
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER)!=null)
+        	{
+        		report.setPentahoServer((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER_PORT)!=null)
+        	{
+        		report.setPentahoServerPort((long) jsonReport.get(JSON_KEY_REPORT_PENTAHO_SERVER_PORT));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_BASE_URL)!=null)
+        	{
+        		report.setPentahoBaseUrl((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_BASE_URL));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_SOLUTION)!=null)
+        	{
+        		report.setPentahoSolution((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_SOLUTION));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_PATH)!=null)
+        	{
+        		report.setPentahoPath((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_PATH));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_RENDER_MODE)!=null)
+        	{
+        		report.setPentahoRenderMode((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_RENDER_MODE));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_OUTPUT_TARGET)!=null)
+        	{
+        		report.setPentahoOutputTarget((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_OUTPUT_TARGET));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_LOCALE)!=null)
+        	{
+        		report.setPentahoLocale((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_LOCALE));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PENTAHO_ATTACHMENT_NAME)!=null)
+        	{
+        		report.setPentahoAttachmentName((String) jsonReport.get(JSON_KEY_REPORT_PENTAHO_ATTACHMENT_NAME));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL)!=null)
+        	{
+        		report.setCheckInterval((long) jsonReport.get(JSON_KEY_REPORT_CHECK_INTERVAL));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_GROUP)!=null)
+        	{
+        		report.setGroup((long) jsonReport.get(JSON_KEY_REPORT_GROUP));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_TARGET_PATH)!=null)
+        	{
+        		report.setTargetPath((String) jsonReport.get(JSON_KEY_REPORT_TARGET_PATH));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS)!=null)
+        	{
+        		report.setMaxCheckIntervals((long) jsonReport.get(JSON_KEY_REPORT_MAX_CHECK_INTERVALS));	
+        	}
+        	if(jsonReport.get(JSON_KEY_REPORT_PARAMETERS)!=null)
+        	{
+        		JSONObject jsonParameters = (JSONObject) jsonReport.get(JSON_KEY_REPORT_PARAMETERS);
+
+        		ArrayList<String>parameters = new ArrayList<String>();
+
+            	for(Object key: jsonParameters.keySet())
+            	{
+            		String value = (String) jsonParameters.get(key);
+            		String keyValue = getParameterKeyValue((String)key, value);
+            		
+            		parameters.add("&" + keyValue);
+            	}
+            	report.setParameters(parameters);
+        	}
+    		addReport(report);
+    	}
+    	else
+    	{
+    		if(!reportFileOk)
+    		{
+    			System.out.println(sdf.format(new Date()) + " - error: in file [" + file.getName() + "] report [" + reportPath + "/" + reportFilename + "] is not existing or can not be read. skipping data.");
+    		}
+    		else if(reportId == null)
+            {
+    			System.out.println(sdf.format(new Date()) + " - error: in file [" + file.getName() + "] report id is undefined. skipping data.");
+            }
+    		else if(reportIdExists)
+            {
+    			System.out.println(sdf.format(new Date()) + " - error: in file [" + file.getName() + "] report id [" + reportId + "] is defined multiple times. skipping data.");
+            }
+    	}
+    	
+    	return report;
+    }
 
 	private String getParameterKeyValue(String key, String value) throws Exception
 	{

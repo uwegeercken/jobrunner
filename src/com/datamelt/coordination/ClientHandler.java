@@ -21,6 +21,7 @@ package com.datamelt.coordination;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -62,7 +63,8 @@ public class ClientHandler extends Thread
     		"jobruntime", 
     		"jobdependencies", 
     		"jobreset", 
-    		"jobremove", 
+    		"jobremove",
+    		"jobadd", 
     		"jobjson", 
     		"listjobs", 
     		"resetjobs", 
@@ -80,7 +82,9 @@ public class ClientHandler extends Thread
     		"reloadreports", 
     		"reportdependencies",
     		"reportexitcode",
-    		"reportcanstart"
+    		"reportcanstart",
+    		"reportremove",
+    		"reportadd", 
     		};
     
     public static final String MESSAGE_UPTIME 				= "uptime";
@@ -94,6 +98,7 @@ public class ClientHandler extends Thread
     public static final String MESSAGE_JOB_RUNTIME			= "jobruntime";
     public static final String MESSAGE_JOB_RESET			= "jobreset";
     public static final String MESSAGE_JOB_REMOVE			= "jobremove";
+    public static final String MESSAGE_JOB_ADD				= "jobadd";
     public static final String MESSAGE_JOB_JSON				= "jobjson";
     public static final String MESSAGE_RESET_JOBS			= "resetjobs";
     public static final String MESSAGE_RELOAD_JOBS			= "reloadjobs";
@@ -112,6 +117,7 @@ public class ClientHandler extends Thread
     public static final String MESSAGE_REPORT_RUNTIME		= "reportruntime";
     public static final String MESSAGE_REPORT_RESET			= "reportreset";
     public static final String MESSAGE_REPORT_REMOVE		= "reportremove";
+    public static final String MESSAGE_REPORT_ADD			= "reportadd";
     public static final String MESSAGE_REPORT_JSON			= "reportjson";
     public static final String MESSAGE_LIST_REPORTS			= "listreports";
     public static final String MESSAGE_LIST_GROUP_REPORTS	= "listgroupreports";
@@ -480,6 +486,63 @@ public class ClientHandler extends Thread
             			{
             				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not existing");
             			}
+            		}
+            		else if(serverObject.startsWith(MESSAGE_JOB_ADD))
+            		{
+            			String id = parseId(serverObject);
+            			try
+       					{
+       						File file = new File(id);
+       						if(file.exists() && file.isFile())
+       						{
+       							Job job  = jobManager.addJob(id);
+       							if(job!=null)
+       							{
+       								sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,id, "added");
+       							}
+       							else
+       							{
+       								sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,id, "already existing");
+       							}
+       						}
+       						else
+       						{
+       							sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,id, "does not exist or not a file");
+       						}
+       					}
+   						catch(Exception ex)
+       					{
+       						sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,id, "error reading file");
+       					}
+            		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_ADD))
+            		{
+            			String id = parseId(serverObject);
+       					try
+       					{
+       						File file = new File(id);
+       						if(file.exists() && file.isFile())
+       						{
+       							Report report = jobManager.addReport(id);
+       							if(report!=null)
+       							{
+       								sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,id, "added");
+       							}
+       							else
+       							{
+       								sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,id, "already existing");
+       							}
+       						}
+       						else
+       						{
+       							sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,id, "does not exist or not a file");
+       						}
+       					}
+       					catch(Exception ex)
+       					{
+       						sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,id, "error reading file");
+       					}
+            			
             		}
             		else if(serverObject.startsWith(MESSAGE_RELOAD_JOBS))
             		{
