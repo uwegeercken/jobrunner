@@ -90,7 +90,7 @@ public class JobManager
 	public static final int STATUS_DEPENDENT_JOB_NOT_FINISHED 			= 3;
 	public static final int STATUS_DEPENDENT_JOB_BAD_EXIT_CODE 			= 4;
 	
-	public static final String[] JOB_STATUS 							= {"undefined","can start","scheduled time not reached","dependent job(s) not finished", "dependent job(s) with bad exit code"};
+	public static final String[] STATUS_TYPES 							= {"undefined","can start","scheduled time not reached","dependent job(s) not finished", "dependent job(s) with bad exit code"};
 	
 	public static final String TIME_DELIMITER							= ":";
 	

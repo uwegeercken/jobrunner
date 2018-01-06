@@ -79,7 +79,8 @@ public class ClientHandler extends Thread
     		"reportjson", 
     		"reloadreports", 
     		"reportdependencies",
-    		"reportexitcode"
+    		"reportexitcode",
+    		"reportcanstart"
     		};
     
     public static final String MESSAGE_UPTIME 				= "uptime";
@@ -106,6 +107,7 @@ public class ClientHandler extends Thread
     public static final String MESSAGE_REPORT_RUN			= "reportrun";
     public static final String MESSAGE_REPORT_GROUP_RUN		= "reportgrouprun";
     public static final String MESSAGE_REPORT_STARTTIME		= "reportstarttime";
+    public static final String MESSAGE_REPORT_CAN_START		= "reportcanstart";
     public static final String MESSAGE_REPORT_START_STATUS	= "reportstartstatus";
     public static final String MESSAGE_REPORT_RUNTIME		= "reportruntime";
     public static final String MESSAGE_REPORT_RESET			= "reportreset";
@@ -189,11 +191,24 @@ public class ClientHandler extends Thread
             			int jobStatus = jobManager.getJobStatus(jobId);
             			if(jobStatus != JobManager.STATUS_UNDEFINED)
             			{
-            				sendClientMessage("status: [" + JobManager.JOB_STATUS[jobStatus] + "]");
+            				sendClientMessage("status: [" + JobManager.STATUS_TYPES[jobStatus] + "]");
             			}
             			else
             			{
             				sendClientMessage(CLIENT_MESSAGE_TYPE_JOB,jobId, "not existing");
+            			}
+            		}
+            		else if(serverObject.startsWith(MESSAGE_REPORT_CAN_START))
+            		{
+            			String reportId = parseId(serverObject);
+            			int reportStatus = jobManager.getReportStatus(reportId);
+            			if(reportStatus != JobManager.STATUS_UNDEFINED)
+            			{
+            				sendClientMessage("status: [" + JobManager.STATUS_TYPES[reportStatus] + "]");
+            			}
+            			else
+            			{
+            				sendClientMessage(CLIENT_MESSAGE_TYPE_REPORT,reportId, "not existing");
             			}
             		}
             		else if(serverObject.startsWith(MESSAGE_JOB_START_STATUS))

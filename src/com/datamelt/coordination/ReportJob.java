@@ -23,11 +23,8 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import com.datamelt.coordination.ClientHandler;
 import com.datamelt.coordination.CoordinationClient;

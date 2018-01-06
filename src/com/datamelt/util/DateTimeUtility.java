@@ -112,7 +112,7 @@ public class DateTimeUtility
 	
 	private static Object getDateMethodResult(String methodName, Integer offset, String dateFormat) throws Exception
 	{
-		Class parameter[] = {Integer.class, String.class};
+		Class<?> parameter[] = {Integer.class, String.class};
 		Object[] objects = {offset, dateFormat};
 		String firstLetterUppercase = methodName.substring(0,1).toUpperCase();
 		String fullMethodName = "get" + firstLetterUppercase + methodName.substring(1);

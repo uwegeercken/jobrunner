@@ -5,7 +5,7 @@
 			"name": "ETL Job 1",
 			"filename": "job_test_01.kjb",
 			"path": "/home/uwe/development/git/jobrunner/pdi",
-			"scheduled_start_time": "23:16:00",
+			"scheduled_start_time": "13:16:00",
 			"check_interval": 3000,
 			"max_check_intervals": 5,
 			"parameters": {"jobnumber": "1","year": "${year:0:yyyy-MM-dd}","month": "${month:-3}"},
